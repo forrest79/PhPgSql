@@ -359,6 +359,7 @@ class Result implements ColumnValueParser, \Countable, \IteratorAggregate
 			$fieldsCnt = \pg_num_fields($this->queryResource);
 			for ($i = 0; $i < $fieldsCnt; $i++) {
 				$name = \pg_field_name($this->queryResource, $i);
+				\assert(\is_string($name));
 				if (isset($this->columnsDataTypes[$name])) {
 					throw Exceptions\ResultException::columnNameIsAlreadyInUse($name);
 				}

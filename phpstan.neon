@@ -2,6 +2,7 @@ includes:
 	- %rootDir%/conf/bleedingEdge.neon
 	- %rootDir%/../phpstan-strict-rules/rules.neon
 	- %rootDir%/../../forrest79/phpgsql-phpstan/extension.neon
+	- %rootDir%/../../../phpstan-php8.php
 
 parameters:
 	level: max
@@ -155,8 +156,8 @@ parameters:
 		# === PHPStan imperfection ===
 
 		-
-			message: '#^Array \(array<string, array\|bool\|Forrest79\\PhPgSql\\Fluent\\Complex\|int\|null>\) does not accept key string\.$#'
-			path: %rootDir%/../../../src/Fluent/Query.php
+			message: "#^Array \\(array\\('select' \\=\\> array\\<int\\|string, Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|Forrest79\\\\PhPgSql\\\\Fluent\\\\Query\\|int\\|string\\>, 'distinct' \\=\\> bool, 'tables' \\=\\> array\\<string, array\\(string, string\\)\\>, 'table\\-types' \\=\\> array\\('main' \\=\\> string\\|null, 'from' \\=\\> array\\<string\\>, 'joins' \\=\\> array\\<string\\>\\), 'join\\-conditions' \\=\\> array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\>, 'where' \\=\\> Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\|null, 'groupBy' \\=\\> array\\<string\\>, 'having' \\=\\> Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\|null, \\.\\.\\.\\)\\) does not accept key string\\.$#"
+			path: src/Fluent/Query.php
 			count: 1
 
 		# === Fix PhPgSql-PHPStan rules ===
