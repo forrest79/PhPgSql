@@ -240,12 +240,9 @@ class QueryBuilder
 	 */
 	private static function prepareRow(mixed $value, array &$values, array &$params): void
 	{
-		if ($value instanceof Db\Sql\Query) {
+		if (($value instanceof Db\Sql) && self::areParenthesisNeeded($value)) {
 			$values[] = '(?)';
 			$params[] = $value;
-		} else if ($value instanceof Query) {
-			$values[] = '(?)';
-			$params[] = $value->createSqlQuery();
 		} else if (\is_array($value)) {
 			throw Exceptions\QueryBuilderException::dataCantContainArray();
 		} else {
@@ -271,12 +268,9 @@ class QueryBuilder
 
 		$set = [];
 		foreach ($queryParams[Query::PARAM_DATA] as $column => $value) {
-			if ($value instanceof Db\Sql\Query) {
+			if (($value instanceof Db\Sql) && self::areParenthesisNeeded($value)) {
 				$set[] = $column . ' = (?)';
 				$params[] = $value;
-			} else if ($value instanceof Query) {
-				$set[] = $column . ' = (?)';
-				$params[] = $value->createSqlQuery();
 			} else if (\is_array($value)) {
 				throw Exceptions\QueryBuilderException::dataCantContainArray();
 			} else {
@@ -413,9 +407,6 @@ class QueryBuilder
 			if ($query instanceof Db\Sql) {
 				$params[] = $query;
 				$query = '?';
-			} else if ($query instanceof Query) {
-				$params[] = $query->createSqlQuery();
-				$query = '?';
 			}
 			$queries[] = $as . ' AS '
 				. (isset($queryParams[Query::PARAM_WITH][Query::WITH_QUERIES_NOT_MATERIALIZED][$as]) ? 'NOT MATERIALIZED ' : '')
@@ -474,9 +465,6 @@ class QueryBuilder
 
 			if ($value instanceof Db\Sql) {
 				$params[] = $value;
-				$value = '(?)';
-			} else if ($value instanceof Query) {
-				$params[] = $value->createSqlQuery();
 				$value = '(?)';
 			}
 
@@ -635,10 +623,7 @@ class QueryBuilder
 		foreach ($orderBy as $value) {
 			if ($value instanceof Db\Sql) {
 				$params[] = $value;
-				$value = '?';
-			} else if ($value instanceof Query) {
-				$params[] = $value->createSqlQuery();
-				$value = '(?)';
+				$value = self::areParenthesisNeeded($value) ? '(?)' : '?';
 			}
 			$columns[] = $value;
 		}
@@ -705,9 +690,6 @@ class QueryBuilder
 			$item = \array_shift($itemParams);
 
 			foreach ($itemParams as $param) {
-				if ($param instanceof Query) {
-					$param = $param->createSqlQuery();
-				}
 				$params[] = $param;
 			}
 
@@ -745,9 +727,6 @@ class QueryBuilder
 			if ($query instanceof Db\Sql) {
 				$params[] = $query;
 				$query = '?';
-			} else if ($query instanceof Query) {
-				$params[] = $query->createSqlQuery();
-				$query = '?';
 			}
 
 			$combines[] = $type . ' (' . $query . ')';
@@ -773,9 +752,6 @@ class QueryBuilder
 		foreach ($queryParams[Query::PARAM_RETURNING] as $key => $value) {
 			if ($value instanceof Db\Sql) {
 				$params[] = $value;
-				$value = '(?)';
-			} else if ($value instanceof Query) {
-				$params[] = $value->createSqlQuery();
 				$value = '(?)';
 			}
 
@@ -811,14 +787,11 @@ class QueryBuilder
 	{
 		if ($table instanceof Db\Sql) {
 			$params[] = $table;
-			if ($table instanceof Db\Sql\Query) {
+			if (self::areParenthesisNeeded($table)) {
 				$table = '(?)';
 			} else {
 				$table = '?';
 			}
-		} else if ($table instanceof Query) {
-			$params[] = $table->createSqlQuery();
-			$table = '(?)';
 		}
 
 		if ($isLateral) {
@@ -848,7 +821,7 @@ class QueryBuilder
 				$cntParams = \count($conditionParams);
 				if (($cnt === 0) && ($cntParams === 1)) {
 					$param = \reset($conditionParams);
-					if (\is_array($param) || ($param instanceof Db\Sql) || ($param instanceof Query)) {
+					if (\is_array($param) || ($param instanceof Db\Sql)) {
 						$condition .= ' IN (?)';
 					} else if ($param === NULL) {
 						$condition .= ' IS NULL';
@@ -868,10 +841,6 @@ class QueryBuilder
 				}
 
 				foreach ($conditionParams as $param) {
-					if ($param instanceof Query) {
-						$param = $param->createSqlQuery();
-					}
-
 					$params[] = $param;
 				}
 			}
@@ -880,6 +849,12 @@ class QueryBuilder
 		}
 
 		return \implode(' ' . $complex->getType() . ' ', $processedConditions);
+	}
+
+
+	private static function areParenthesisNeeded(Db\Sql $sql): bool
+	{
+		return $sql instanceof Db\Sql\Query || $sql instanceof Query;
 	}
 
 }

@@ -719,7 +719,7 @@ final class FluentQueryTest extends Tests\TestCase
 			->createSqlQuery()
 			->createQuery();
 
-		Tester\Assert::same('SELECT column FROM table AS t ORDER BY sort_by_value(column)', $query->getSql());
+		Tester\Assert::same('SELECT column FROM table AS t ORDER BY (sort_by_value(column))', $query->getSql());
 		Tester\Assert::same([], $query->getParams());
 	}
 

@@ -7,7 +7,7 @@ use Forrest79\PhPgSql\Db;
 /**
  * @phpstan-import-type QueryParams from QueryBuilder
  */
-class Query
+class Query implements Db\Sql
 {
 	public const QUERY_SELECT = 'select';
 	public const QUERY_INSERT = 'insert';
@@ -129,14 +129,14 @@ class Query
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function table(string|self|Db\Sql $table, string|NULL $alias = NULL): static
+	public function table(string|Db\Sql $table, string|NULL $alias = NULL): static
 	{
 		return $this->addTable(self::TABLE_TYPE_MAIN, $table, $alias);
 	}
 
 
 	/**
-	 * @param array<int|string, string|int|bool|\BackedEnum|self|Db\Sql|NULL> $columns
+	 * @param array<int|string, string|int|bool|\BackedEnum|Db\Sql|NULL> $columns
 	 * @throws Exceptions\QueryException
 	 */
 	public function select(array $columns): static
@@ -158,7 +158,7 @@ class Query
 
 			$this->checkAlias($column, $alias);
 
-			if (!($column instanceof self) && !($column instanceof Db\Sql) && !\is_scalar($column) && !($column instanceof \BackedEnum) && !($column instanceof self) && !($column instanceof Db\Sql)) {
+			if (!($column instanceof Db\Sql) && !\is_scalar($column) && !($column instanceof \BackedEnum)) {
 				throw Exceptions\QueryException::columnMustBeScalarOrEnumOrExpression();
 			}
 		}
@@ -198,7 +198,7 @@ class Query
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function from(string|self|Db\Sql $from, string|NULL $alias = NULL): static
+	public function from(string|Db\Sql $from, string|NULL $alias = NULL): static
 	{
 		return $this->addTable(self::TABLE_TYPE_FROM, $from, $alias);
 	}
@@ -208,7 +208,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function join(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -221,7 +221,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function innerJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -234,7 +234,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function leftJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -247,7 +247,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function leftOuterJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -260,7 +260,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function rightJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -273,7 +273,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function rightOuterJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -286,7 +286,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function fullJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -299,7 +299,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function fullOuterJoin(
-		string|self|Db\Sql $join,
+		string|Db\Sql $join,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -311,7 +311,7 @@ class Query
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function crossJoin(string|self|Db\Sql $join, string|NULL $alias = NULL): static
+	public function crossJoin(string|Db\Sql $join, string|NULL $alias = NULL): static
 	{
 		return $this->addTable(self::JOIN_CROSS, $join, $alias);
 	}
@@ -322,7 +322,7 @@ class Query
 	 */
 	private function addTable(
 		string $type,
-		string|self|Db\Sql $name,
+		string|Db\Sql $name,
 		string|NULL $alias,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -516,7 +516,7 @@ class Query
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function orderBy(string|self|Db\Sql ...$columns): static
+	public function orderBy(string|Db\Sql ...$columns): static
 	{
 		$this->resetQuery();
 
@@ -552,31 +552,31 @@ class Query
 	}
 
 
-	public function union(string|self|Db\Sql $query): static
+	public function union(string|Db\Sql $query): static
 	{
 		return $this->addCombine(self::COMBINE_UNION, $query);
 	}
 
 
-	public function unionAll(string|self|Db\Sql $query): static
+	public function unionAll(string|Db\Sql $query): static
 	{
 		return $this->addCombine(self::COMBINE_UNION_ALL, $query);
 	}
 
 
-	public function intersect(string|self|Db\Sql $query): static
+	public function intersect(string|Db\Sql $query): static
 	{
 		return $this->addCombine(self::COMBINE_INTERSECT, $query);
 	}
 
 
-	public function except(string|self|Db\Sql $query): static
+	public function except(string|Db\Sql $query): static
 	{
 		return $this->addCombine(self::COMBINE_EXCEPT, $query);
 	}
 
 
-	private function addCombine(string $type, string|self|Db\Sql $query): static
+	private function addCombine(string $type, string|Db\Sql $query): static
 	{
 		$this->params[self::PARAM_COMBINE_QUERIES][] = [$query, $type];
 		return $this;
@@ -734,7 +734,7 @@ class Query
 
 
 	/**
-	 * @param array<int|string, string|int|self|Db\Sql> $returning
+	 * @param array<int|string, string|int|Db\Sql> $returning
 	 * @throws Exceptions\QueryException
 	 */
 	public function returning(array $returning): static
@@ -768,7 +768,7 @@ class Query
 	 * @throws Exceptions\QueryException
 	 */
 	public function using(
-		string|self|Db\Sql $dataSource,
+		string|Db\Sql $dataSource,
 		string|NULL $alias = NULL,
 		string|Complex|Db\Sql|NULL $onCondition = NULL,
 	): static
@@ -833,7 +833,7 @@ class Query
 	 */
 	public function with(
 		string $as,
-		string|self|Db\Sql $query,
+		string|Db\Sql $query,
 		string|NULL $suffix = NULL,
 		bool $notMaterialized = FALSE,
 	): static
@@ -943,7 +943,7 @@ class Query
 	 */
 	private function checkAlias(mixed $data, string|NULL $alias): void
 	{
-		if ((($data instanceof self) || ($data instanceof Db\Sql)) && ($alias === NULL)) {
+		if ((($data instanceof Db\Sql)) && ($alias === NULL)) {
 			throw Exceptions\QueryException::sqlMustHaveAlias();
 		}
 	}
@@ -959,6 +959,21 @@ class Query
 		}
 
 		return $this->query;
+	}
+
+
+	public function getSql(): string
+	{
+		return $this->createSqlQuery()->getSql();
+	}
+
+
+	/**
+	 * @return list<mixed>
+	 */
+	public function getParams(): array
+	{
+		return $this->createSqlQuery()->getParams();
 	}
 
 
