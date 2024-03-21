@@ -28,7 +28,7 @@ parameters:
 			count: 1
 
 		-
-			message: '#^Parameter \#1 \$columns of method Forrest79\\PhPgSql\\Fluent\\Query::select\(\) expects array\<int\|string, BackedEnum\|bool\|Forrest79\\PhPgSql\\Db\\Sql\|Forrest79\\PhPgSql\\Fluent\\Query\|int\|string\|null\>, array\<string, array\<int, string\>\> given\.$#'
+			message: '#^Parameter \#1 \$columns of method Forrest79\\PhPgSql\\Fluent\\Query::select\(\) expects array\<int\|string, BackedEnum\|bool\|Forrest79\\PhPgSql\\Db\\Sql\|int\|string\|null\>, array\<string, array\<int, string\>\> given\.$#'
 			path: %rootDir%/../../../tests/Unit/FluentQueryTest.php
 			count: 1
 
@@ -137,14 +137,14 @@ parameters:
 		# === We know, that this can happen ===
 
 		-
-			message: '#^Instanceof between .+ and .+ will always evaluate to (true|false)\.$#'
+			message: '#^Instanceof between BackedEnum and BackedEnum will always evaluate to true\.$#'
 			path: %rootDir%/../../../src/Fluent/Query.php
-			count: 3
+			count: 1
 
 		-
 			message: '#^Result of && is always false\.$#'
 			path: %rootDir%/../../../src/Fluent/Query.php
-			count: 3
+			count: 1
 
 		-
 			message: "#^Strict comparison using === between 'suffix' and 'suffix' will always evaluate to true\\.$#"
@@ -186,7 +186,7 @@ parameters:
 		# === PHPStan imperfection ===
 
 		-
-			message: "#^Property Forrest79\\\\PhPgSql\\\\Fluent\\\\Query::\\$params \\(array\\{select: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|Forrest79\\\\PhPgSql\\\\Fluent\\\\Query\\|int\\|string\\>, distinct: bool, tables: array\\<string, array\\{string, string\\}\\>, table\\-types: array\\{main: string\\|null, from: list\\<string\\>, joins: list\\<string\\>, using: string\\|null\\}, on\\-conditions: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\>, lateral\\-tables: array\\<string, string\\>, where: Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\|null, groupBy: array\\<string\\>, \\.\\.\\.\\}\\) does not accept .+\\.$#"
+			message: "#^Property Forrest79\\\\PhPgSql\\\\Fluent\\\\Query::\\$params \\(array\\{select: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct: bool, tables: array\\<string, array\\{string, string\\}\\>, table\\-types: array\\{main: string\\|null, from: list\\<string\\>, joins: list\\<string\\>, using: string\\|null\\}, on\\-conditions: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\>, lateral\\-tables: array\\<string, string\\>, where: Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\|null, groupBy: array\\<string\\>, \\.\\.\\.\\}\\) does not accept .+\\.$#"
 			path: src/Fluent/Query.php
 			count: 5
 
