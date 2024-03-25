@@ -195,7 +195,7 @@ class Query implements Db\Sql
 	public function join(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->innerJoin($join, $alias, $onCondition);
@@ -208,7 +208,7 @@ class Query implements Db\Sql
 	public function innerJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->addTable(self::JOIN_INNER, $join, $alias, $onCondition);
@@ -221,7 +221,7 @@ class Query implements Db\Sql
 	public function leftJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->leftOuterJoin($join, $alias, $onCondition);
@@ -234,7 +234,7 @@ class Query implements Db\Sql
 	public function leftOuterJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->addTable(self::JOIN_LEFT_OUTER, $join, $alias, $onCondition);
@@ -247,7 +247,7 @@ class Query implements Db\Sql
 	public function rightJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->rightOuterJoin($join, $alias, $onCondition);
@@ -260,7 +260,7 @@ class Query implements Db\Sql
 	public function rightOuterJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->addTable(self::JOIN_RIGHT_OUTER, $join, $alias, $onCondition);
@@ -273,7 +273,7 @@ class Query implements Db\Sql
 	public function fullJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->fullOuterJoin($join, $alias, $onCondition);
@@ -286,7 +286,7 @@ class Query implements Db\Sql
 	public function fullOuterJoin(
 		string|Db\Sql $join,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->addTable(self::JOIN_FULL_OUTER, $join, $alias, $onCondition);
@@ -309,7 +309,7 @@ class Query implements Db\Sql
 		string $type,
 		string|Db\Sql $name,
 		string|NULL $alias,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		$this->resetQuery();
@@ -338,7 +338,7 @@ class Query implements Db\Sql
 		}
 
 		if ($onCondition !== NULL) {
-			$this->getComplexParam(self::PARAM_ON_CONDITIONS, $alias)->add($onCondition);
+			$this->getConditionParam(self::PARAM_ON_CONDITIONS, $alias)->add($onCondition);
 		}
 
 		return $this;
@@ -348,11 +348,11 @@ class Query implements Db\Sql
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function on(string $alias, string|Complex|Db\Sql $condition, mixed ...$params): static
+	public function on(string $alias, string|Db\Sql $condition, mixed ...$params): static
 	{
 		$this->resetQuery();
 
-		$this->getComplexParam(self::PARAM_ON_CONDITIONS, $alias)->add($condition, ...$params);
+		$this->getConditionParam(self::PARAM_ON_CONDITIONS, $alias)->add($condition, ...$params);
 
 		return $this;
 	}
@@ -369,43 +369,43 @@ class Query implements Db\Sql
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function where(string|Complex|Db\Sql $condition, mixed ...$params): static
+	public function where(string|Db\Sql $condition, mixed ...$params): static
 	{
 		$this->resetQuery();
 
-		$this->getComplexParam(self::PARAM_WHERE)->add($condition, ...$params);
+		$this->getConditionParam(self::PARAM_WHERE)->add($condition, ...$params);
 
 		return $this;
 	}
 
 
 	/**
-	 * @param list<string|list<mixed>|Db\Sql|Complex> $conditions
+	 * @param list<string|list<mixed>|Db\Sql> $conditions
 	 * @throws Exceptions\QueryException
 	 */
-	public function whereAnd(array $conditions = []): Complex
+	public function whereAnd(array $conditions = []): Condition
 	{
 		$this->resetQuery();
 
-		$complex = Complex::createAnd($conditions, NULL, $this);
-		$this->getComplexParam(self::PARAM_WHERE)->add($complex);
+		$condition = Condition::createAnd($conditions, NULL, $this);
+		$this->getConditionParam(self::PARAM_WHERE)->add($condition);
 
-		return $complex;
+		return $condition;
 	}
 
 
 	/**
-	 * @param list<string|list<mixed>|Db\Sql|Complex> $conditions
+	 * @param list<string|list<mixed>|Db\Sql> $conditions
 	 * @throws Exceptions\QueryException
 	 */
-	public function whereOr(array $conditions = []): Complex
+	public function whereOr(array $conditions = []): Condition
 	{
 		$this->resetQuery();
 
-		$complex = Complex::createOr($conditions, NULL, $this);
-		$this->getComplexParam(self::PARAM_WHERE)->add($complex);
+		$condition = Condition::createOr($conditions, NULL, $this);
+		$this->getConditionParam(self::PARAM_WHERE)->add($condition);
 
-		return $complex;
+		return $condition;
 	}
 
 
@@ -425,57 +425,57 @@ class Query implements Db\Sql
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function having(string|Complex|Db\Sql $condition, mixed ...$params): static
+	public function having(string|Db\Sql $condition, mixed ...$params): static
 	{
 		$this->resetQuery();
 
-		$this->getComplexParam(self::PARAM_HAVING)->add($condition, ...$params);
+		$this->getConditionParam(self::PARAM_HAVING)->add($condition, ...$params);
 
 		return $this;
 	}
 
 
 	/**
-	 * @param list<string|list<mixed>|Db\Sql|Complex> $conditions
+	 * @param list<string|list<mixed>|Db\Sql> $conditions
 	 * @throws Exceptions\QueryException
 	 */
-	public function havingAnd(array $conditions = []): Complex
+	public function havingAnd(array $conditions = []): Condition
 	{
 		$this->resetQuery();
 
-		$complex = Complex::createAnd($conditions, NULL, $this);
-		$this->getComplexParam(self::PARAM_HAVING)->add($complex);
+		$condition = Condition::createAnd($conditions, NULL, $this);
+		$this->getConditionParam(self::PARAM_HAVING)->add($condition);
 
-		return $complex;
+		return $condition;
 	}
 
 
 	/**
-	 * @param list<string|list<mixed>|Db\Sql|Complex> $conditions
+	 * @param list<string|list<mixed>|Db\Sql> $conditions
 	 * @throws Exceptions\QueryException
 	 */
-	public function havingOr(array $conditions = []): Complex
+	public function havingOr(array $conditions = []): Condition
 	{
 		$this->resetQuery();
 
-		$complex = Complex::createOr($conditions, NULL, $this);
-		$this->getComplexParam(self::PARAM_HAVING)->add($complex);
+		$condition = Condition::createOr($conditions, NULL, $this);
+		$this->getConditionParam(self::PARAM_HAVING)->add($condition);
 
-		return $complex;
+		return $condition;
 	}
 
 
-	private function getComplexParam(string $param, string|NULL $alias = NULL): Complex
+	private function getConditionParam(string $param, string|NULL $alias = NULL): Condition
 	{
 		if ($param === self::PARAM_ON_CONDITIONS) {
 			if (!isset($this->params[$param][$alias])) {
-				$this->params[$param][$alias] = Complex::createAnd();
+				$this->params[$param][$alias] = Condition::createAnd();
 			}
 
 			return $this->params[$param][$alias];
 		} else if (($param === self::PARAM_WHERE) || ($param === self::PARAM_HAVING)) {
 			if ($this->params[$param] === NULL) {
-				$this->params[$param] = Complex::createAnd();
+				$this->params[$param] = Condition::createAnd();
 			}
 
 			return $this->params[$param];
@@ -609,10 +609,7 @@ class Query implements Db\Sql
 	 * @param string|list<string>|NULL $columnsOrConstraint
 	 * @throws Exceptions\QueryException
 	 */
-	public function onConflict(
-		string|array|NULL $columnsOrConstraint = NULL,
-		string|Complex|Db\Sql|NULL $where = NULL,
-	): static
+	public function onConflict(string|array|NULL $columnsOrConstraint = NULL, string|Db\Sql|NULL $where = NULL): static
 	{
 		$this->resetQuery();
 
@@ -621,7 +618,7 @@ class Query implements Db\Sql
 		}
 
 		$this->params[self::PARAM_INSERT_ONCONFLICT][self::INSERT_ONCONFLICT_COLUMNS_OR_CONSTRAINT] = $columnsOrConstraint ?? FALSE;
-		$this->params[self::PARAM_INSERT_ONCONFLICT][self::INSERT_ONCONFLICT_WHERE] = $where === NULL ? NULL : Complex::createAnd()->add($where);
+		$this->params[self::PARAM_INSERT_ONCONFLICT][self::INSERT_ONCONFLICT_WHERE] = $where === NULL ? NULL : Condition::createAnd()->add($where);
 
 		return $this;
 	}
@@ -631,12 +628,12 @@ class Query implements Db\Sql
 	 * @param array<int|string, string|Db\Sql> $set
 	 * @throws Exceptions\QueryException
 	 */
-	public function doUpdate(array $set, string|Complex|Db\Sql|NULL $where = NULL): static
+	public function doUpdate(array $set, string|Db\Sql|NULL $where = NULL): static
 	{
 		$this->resetQuery();
 
 		$this->params[self::PARAM_INSERT_ONCONFLICT][self::INSERT_ONCONFLICT_DO] = $set;
-		$this->params[self::PARAM_INSERT_ONCONFLICT][self::INSERT_ONCONFLICT_DO_WHERE] = $where === NULL ? NULL : Complex::createAnd()->add($where);
+		$this->params[self::PARAM_INSERT_ONCONFLICT][self::INSERT_ONCONFLICT_DO_WHERE] = $where === NULL ? NULL : Condition::createAnd()->add($where);
 
 		return $this;
 	}
@@ -742,7 +739,7 @@ class Query implements Db\Sql
 	public function using(
 		string|Db\Sql $dataSource,
 		string|NULL $alias = NULL,
-		string|Complex|Db\Sql|NULL $onCondition = NULL,
+		string|Db\Sql|NULL $onCondition = NULL,
 	): static
 	{
 		return $this->addTable(self::TABLE_TYPE_USING, $dataSource, $alias, $onCondition);
@@ -752,14 +749,14 @@ class Query implements Db\Sql
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function whenMatched(string|Db\Sql $then, string|Complex|Db\Sql|NULL $condition = NULL): static
+	public function whenMatched(string|Db\Sql $then, string|Db\Sql|NULL $condition = NULL): static
 	{
 		$this->resetQuery();
 
 		$this->params[self::PARAM_MERGE][] = [
 			self::MERGE_WHEN_MATCHED,
 			$then,
-			$condition === NULL ? NULL : Complex::createAnd()->add($condition),
+			$condition === NULL ? NULL : Condition::createAnd()->add($condition),
 		];
 
 		return $this;
@@ -769,14 +766,14 @@ class Query implements Db\Sql
 	/**
 	 * @throws Exceptions\QueryException
 	 */
-	public function whenNotMatched(string|Db\Sql $then, string|Complex|Db\Sql|NULL $condition = NULL): static
+	public function whenNotMatched(string|Db\Sql $then, string|Db\Sql|NULL $condition = NULL): static
 	{
 		$this->resetQuery();
 
 		$this->params[self::PARAM_MERGE][] = [
 			self::MERGE_WHEN_NOT_MATCHED,
 			$then,
-			$condition === NULL ? NULL : Complex::createAnd()->add($condition),
+			$condition === NULL ? NULL : Condition::createAnd()->add($condition),
 		];
 
 		return $this;

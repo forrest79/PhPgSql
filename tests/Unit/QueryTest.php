@@ -141,7 +141,7 @@ final class QueryTest extends Tests\TestCase
 	}
 
 
-	public function testPrepareQueryComplex(): void
+	public function testPrepareQueryCondition(): void
 	{
 		$subquery = Db\Sql\Query::create(
 			'SELECT id FROM subtable WHERE when = ? AND text ILIKE \'When\?\' AND year > ?',

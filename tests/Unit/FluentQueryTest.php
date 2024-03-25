@@ -176,16 +176,16 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testWhereWithComplex(): void
+	public function testWhereWithCondition(): void
 	{
-		$complex = Fluent\Complex::createAnd()
+		$condition = Fluent\Condition::createAnd()
 			->add('x.column = t.id')
 			->add('x.id', [1, 2]);
 
 		$query = $this->query()
 			->select(['x.column'])
 			->from('table', 't')
-			->where($complex)
+			->where($condition)
 			->createSqlQuery()
 			->createQuery();
 
@@ -212,13 +212,13 @@ final class FluentQueryTest extends Tests\TestCase
 	{
 		Tester\Assert::exception(function (): void {
 			$this->query()->where(Db\Sql\Expression::create('x.column = ?'), 1);
-		}, Fluent\Exceptions\ComplexException::class, NULL, Fluent\Exceptions\ComplexException::ONLY_STRING_CONDITION_CAN_HAVE_PARAMS);
+		}, Fluent\Exceptions\ConditionException::class, NULL, Fluent\Exceptions\ConditionException::ONLY_STRING_CONDITION_CAN_HAVE_PARAMS);
 	}
 
 
 	public function testWhereAnd(): void
 	{
-		$complex = Fluent\Complex::createAnd()
+		$condition = Fluent\Condition::createAnd()
 			->add('x.type = t.id')
 			->add('x.test', [3, 5]);
 
@@ -228,7 +228,7 @@ final class FluentQueryTest extends Tests\TestCase
 			->whereAnd([
 				'x.column = t.id',
 				['x.column', 1],
-				$complex,
+				$condition,
 				Db\Sql\Expression::create('x.id', 7),
 			])
 			->query()
@@ -246,13 +246,13 @@ final class FluentQueryTest extends Tests\TestCase
 			->select(['x.column'])
 			->from('table', 't');
 
-		$complex = $sourceQuery->whereAnd([
+		$condition = $sourceQuery->whereAnd([
 			'x.column = t.id',
 			Db\Sql\Expression::create('x.id', 7),
 		]);
 
-		$complex
-			->add(Fluent\Complex::createAnd()->add('x.type = t.id')->add('x.test', [3, 5]))
+		$condition
+			->add(Fluent\Condition::createAnd()->add('x.type = t.id')->add('x.test', [3, 5]))
 			->add('x.column', 1);
 
 		$query = $sourceQuery
@@ -266,7 +266,7 @@ final class FluentQueryTest extends Tests\TestCase
 
 	public function testWhereOr(): void
 	{
-		$complex = Fluent\Complex::createAnd()
+		$condition = Fluent\Condition::createAnd()
 			->add('x.type = t.id')
 			->add('x.test', [3, 5]);
 
@@ -276,7 +276,7 @@ final class FluentQueryTest extends Tests\TestCase
 			->whereOr([
 				'x.column = t.id',
 				['x.column', 1],
-				$complex,
+				$condition,
 				Db\Sql\Expression::create('x.id', 7),
 			])
 			->query()
@@ -316,16 +316,16 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testHavingWithComplex(): void
+	public function testHavingWithCondition(): void
 	{
-		$complex = Fluent\Complex::createAnd()
+		$condition = Fluent\Condition::createAnd()
 			->add('x.column = t.id')
 			->add('x.id', [1, 2]);
 
 		$query = $this->query()
 			->select(['x.column'])
 			->from('table', 't')
-			->having($complex)
+			->having($condition)
 			->createSqlQuery()
 			->createQuery();
 
@@ -352,13 +352,13 @@ final class FluentQueryTest extends Tests\TestCase
 	{
 		Tester\Assert::exception(function (): void {
 			$this->query()->having(Db\Sql\Expression::create('x.column = ?'), 1);
-		}, Fluent\Exceptions\ComplexException::class, NULL, Fluent\Exceptions\ComplexException::ONLY_STRING_CONDITION_CAN_HAVE_PARAMS);
+		}, Fluent\Exceptions\ConditionException::class, NULL, Fluent\Exceptions\ConditionException::ONLY_STRING_CONDITION_CAN_HAVE_PARAMS);
 	}
 
 
 	public function testHavingAnd(): void
 	{
-		$complex = Fluent\Complex::createAnd()
+		$condition = Fluent\Condition::createAnd()
 			->add('x.type = t.id')
 			->add('x.test', [3, 5]);
 
@@ -368,7 +368,7 @@ final class FluentQueryTest extends Tests\TestCase
 			->havingAnd([
 				'x.column = t.id',
 				['x.column', 1],
-				$complex,
+				$condition,
 				Db\Sql\Expression::create('x.id', 7),
 			])
 			->query()
@@ -382,7 +382,7 @@ final class FluentQueryTest extends Tests\TestCase
 
 	public function testHavingOr(): void
 	{
-		$complex = Fluent\Complex::createAnd()
+		$condition = Fluent\Condition::createAnd()
 			->add('x.type = t.id')
 			->add('x.test', [3, 5]);
 
@@ -392,7 +392,7 @@ final class FluentQueryTest extends Tests\TestCase
 			->havingOr([
 				'x.column = t.id',
 				['x.column', 1],
-				$complex,
+				$condition,
 				Db\Sql\Expression::create('x.id', 7),
 			])
 			->query()
@@ -410,13 +410,13 @@ final class FluentQueryTest extends Tests\TestCase
 			->select(['x.column'])
 			->from('table', 't');
 
-		$complex = $sourceQuery->havingOr([
+		$condition = $sourceQuery->havingOr([
 			'x.column = t.id',
 			Db\Sql\Expression::create('x.id', 7),
 		]);
 
-		$complex
-			->add(Fluent\Complex::createAnd()->add('x.type = t.id')->add('x.test', [3, 5]))
+		$condition
+			->add(Fluent\Condition::createAnd()->add('x.type = t.id')->add('x.test', [3, 5]))
 			->add('x.column', 1);
 
 		$query = $sourceQuery
@@ -470,16 +470,16 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testJoinWithComplexOn(): void
+	public function testJoinWithConditionOn(): void
 	{
-		$complexOn = Fluent\Complex::createAnd()
+		$conditionOn = Fluent\Condition::createAnd()
 			->add('x.column = t.id')
 			->add('x.id', [1, 2]);
 
 		$query = $this->query()
 			->select(['x.column'])
 			->from('table', 't')
-			->join('another', 'x', $complexOn)
+			->join('another', 'x', $conditionOn)
 			->createSqlQuery()
 			->createQuery();
 
@@ -504,9 +504,9 @@ final class FluentQueryTest extends Tests\TestCase
 
 	public function testJoinWithAddOn(): void
 	{
-		$complexOn = Fluent\Complex::createOr()
-			->add('x.complex_id = t.id')
-			->add('x.complex_id', [3, 4]);
+		$conditionOn = Fluent\Condition::createOr()
+			->add('x.condition_id = t.id')
+			->add('x.condition_id', [3, 4]);
 
 		$query = $this->query()
 			->select(['x.column'])
@@ -515,11 +515,11 @@ final class FluentQueryTest extends Tests\TestCase
 				->on('x', 'x.id = 1')
 				->on('x', 'x.id = ?', 2)
 				->on('x', Db\Sql\Expression::create('x.type_id = ?', 'test'))
-				->on('x', $complexOn)
+				->on('x', $conditionOn)
 			->createSqlQuery()
 			->createQuery();
 
-		Tester\Assert::same('SELECT x.column FROM table AS t INNER JOIN another AS x ON (x.column = t.id) AND (x.id = 1) AND (x.id = $1) AND (x.type_id = $2) AND ((x.complex_id = t.id) OR (x.complex_id IN ($3, $4)))', $query->getSql());
+		Tester\Assert::same('SELECT x.column FROM table AS t INNER JOIN another AS x ON (x.column = t.id) AND (x.id = 1) AND (x.id = $1) AND (x.type_id = $2) AND ((x.condition_id = t.id) OR (x.condition_id IN ($3, $4)))', $query->getSql());
 		Tester\Assert::same([2, 'test', 3, 4], $query->getParams());
 	}
 
@@ -528,7 +528,7 @@ final class FluentQueryTest extends Tests\TestCase
 	{
 		Tester\Assert::exception(function (): void {
 			$this->query()->on('x', Db\Sql\Expression::create('x.column = ?'), 1);
-		}, Fluent\Exceptions\ComplexException::class, NULL, Fluent\Exceptions\ComplexException::ONLY_STRING_CONDITION_CAN_HAVE_PARAMS);
+		}, Fluent\Exceptions\ConditionException::class, NULL, Fluent\Exceptions\ConditionException::ONLY_STRING_CONDITION_CAN_HAVE_PARAMS);
 	}
 
 
@@ -856,7 +856,7 @@ final class FluentQueryTest extends Tests\TestCase
 				'age' => 20,
 				'info' => 'Text',
 			])
-			->onConflict(['name', 'age'], Fluent\Complex::createAnd()->add('age < ?', 30))
+			->onConflict(['name', 'age'], Fluent\Condition::createAnd()->add('age < ?', 30))
 			->doUpdate(['info'])
 			->createSqlQuery()
 			->createQuery();
@@ -895,14 +895,14 @@ final class FluentQueryTest extends Tests\TestCase
 					'age' => 20,
 					'info' => 'Text',
 				])
-				->onConflict('name_ukey', Fluent\Complex::createAnd()->add('age < ?', 30))
+				->onConflict('name_ukey', Fluent\Condition::createAnd()->add('age < ?', 30))
 				->doUpdate(['info'])
 				->createSqlQuery();
 		}, Fluent\Exceptions\QueryException::class, NULL, Fluent\Exceptions\QueryException::ON_CONFLICT_WHERE_NOT_FOR_CONSTRAINT);
 	}
 
 
-	public function testInsertOnConflictDoUpdateWithComplexSet(): void
+	public function testInsertOnConflictDoUpdateWithConditionSet(): void
 	{
 		$query = $this->query()
 			->insert('table', 't')
@@ -948,7 +948,7 @@ final class FluentQueryTest extends Tests\TestCase
 				'info' => 'Text',
 			])
 			->onConflict(['name', 'age'])
-			->doUpdate(['info'], Fluent\Complex::createAnd()->add('age < ?', 30))
+			->doUpdate(['info'], Fluent\Condition::createAnd()->add('age < ?', 30))
 			->createSqlQuery()
 			->createQuery();
 
@@ -1253,11 +1253,11 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testMergeOnComplex(): void
+	public function testMergeOnCondition(): void
 	{
 		$query = $this->query()
 			->merge('customer_account', 'ca')
-			->using('(SELECT customer_id, transaction_value FROM recent_transactions)', 't', Fluent\Complex::createAnd()->add('t.customer_id = ca.customer_id')->add('t.customer_id > ?', 10))
+			->using('(SELECT customer_id, transaction_value FROM recent_transactions)', 't', Fluent\Condition::createAnd()->add('t.customer_id = ca.customer_id')->add('t.customer_id > ?', 10))
 			->whenMatched('UPDATE SET balance = balance + transaction_value')
 			->whenNotMatched('INSERT (customer_id, balance) VALUES (t.customer_id, t.transaction_value)')
 			->createSqlQuery()
@@ -1274,7 +1274,7 @@ final class FluentQueryTest extends Tests\TestCase
 			->merge('wines', 'w')
 			->using('wine_stock_changes', 's', 's.winename = w.winename')
 			->whenNotMatched('INSERT VALUES(s.winename, s.stock_delta)', 's.stock_delta > 0')
-			->whenMatched('UPDATE SET stock = w.stock + s.stock_delta', Fluent\Complex::createAnd()->add('w.stock + s.stock_delta > ?', 0))
+			->whenMatched('UPDATE SET stock = w.stock + s.stock_delta', Fluent\Condition::createAnd()->add('w.stock + s.stock_delta > ?', 0))
 			->whenMatched('UPDATE SET stock = w.stock - s.stock_delta', Db\Sql\Expression::create('w.stock + s.stock_delta < ?', 0))
 			->whenMatched('DELETE')
 			->createSqlQuery()
@@ -1599,17 +1599,17 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testComplexWhere(): void
+	public function testConditionWhere(): void
 	{
-		$complexOr = $this->query()->whereOr();
-		$complexOr->add('column', 1);
-		$complexOr->add('column2', [2, 3]);
-		$complexAnd = $complexOr->addComplexAnd();
-		$complexAnd->add('column', $this->query()->select([1]));
-		$complexAnd->add('column2 = ANY(?)', new Db\Sql\Query('SELECT 2'));
-		$complexOr->add('column3 IS NOT NULL');
+		$conditionOr = $this->query()->whereOr();
+		$conditionOr->add('column', 1);
+		$conditionOr->add('column2', [2, 3]);
+		$conditionAnd = $conditionOr->addAndBranch();
+		$conditionAnd->add('column', $this->query()->select([1]));
+		$conditionAnd->add('column2 = ANY(?)', new Db\Sql\Query('SELECT 2'));
+		$conditionOr->add('column3 IS NOT NULL');
 
-		$query = $complexOr->query()
+		$query = $conditionOr->query()
 			->select(['*'])
 			->from('table')
 			->createSqlQuery()
@@ -1620,17 +1620,17 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testComplexHaving(): void
+	public function testConditionHaving(): void
 	{
-		$complexOr = $this->query()->havingOr();
-		$complexOr->add('column', 1);
-		$complexOr->add('column2', [2, 3]);
-		$complexAnd = $complexOr->addComplexAnd();
-		$complexAnd->add('column', $this->query()->select([1]));
-		$complexAnd->add('column2 = ANY(?)', new Db\Sql\Query('SELECT 2'));
-		$complexOr->add('column3 IS NOT NULL');
+		$conditionOr = $this->query()->havingOr();
+		$conditionOr->add('column', 1);
+		$conditionOr->add('column2', [2, 3]);
+		$conditionAnd = $conditionOr->addAndBranch();
+		$conditionAnd->add('column', $this->query()->select([1]));
+		$conditionAnd->add('column2 = ANY(?)', new Db\Sql\Query('SELECT 2'));
+		$conditionOr->add('column3 IS NOT NULL');
 
-		$query = $complexOr->query()
+		$query = $conditionOr->query()
 			->select(['*'])
 			->from('table')
 			->groupBy('column', 'column2')
@@ -1642,7 +1642,7 @@ final class FluentQueryTest extends Tests\TestCase
 	}
 
 
-	public function testComplexBadParams(): void
+	public function testConditionBadParams(): void
 	{
 		Tester\Assert::exception(function (): void {
 			$this->query()
@@ -1650,8 +1650,9 @@ final class FluentQueryTest extends Tests\TestCase
 					->add('columns = ? AND column2 = ?', 1, 2, 3)
 				->query()
 				->select(['*'])
-				->createSqlQuery();
-		}, Fluent\Exceptions\QueryBuilderException::class, NULL, Fluent\Exceptions\QueryBuilderException::BAD_PARAMS_COUNT);
+				->createSqlQuery()
+				->createQuery();
+		}, Fluent\Exceptions\ConditionException::class, NULL, Fluent\Exceptions\ConditionException::BAD_PARAMS_COUNT);
 	}
 
 
