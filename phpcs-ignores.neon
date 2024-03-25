@@ -309,13 +309,13 @@ ignoreErrors:
 		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
 		message: All classes should be declared using either the "abstract" or "final" keyword.
 		count: 1
-		path: src/Fluent/Complex.php
+		path: src/Fluent/Condition.php
 
 	-
 		sniff: SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
-		message: 'Method \Forrest79\PhPgSql\Fluent\Complex::offsetExists() does not have native type hint for its parameter $offset but it should be possible to add it based on @param annotation "int".'
+		message: 'Method \Forrest79\PhPgSql\Fluent\Condition::offsetExists() does not have native type hint for its parameter $offset but it should be possible to add it based on @param annotation "int".'
 		count: 1
-		path: src/Fluent/Complex.php
+		path: src/Fluent/Condition.php
 
 	-
 		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
@@ -327,7 +327,7 @@ ignoreErrors:
 		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
 		message: All classes should be declared using either the "abstract" or "final" keyword.
 		count: 1
-		path: src/Fluent/Exceptions/ComplexException.php
+		path: src/Fluent/Exceptions/ConditionException.php
 
 	-
 		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
@@ -537,7 +537,7 @@ ignoreErrors:
 		sniff: PSR1.Files.SideEffects.FoundWithSymbols
 		message: 'A file should declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it should execute logic with side effects, but should not do both. The first symbol is defined on line 14 and the first side effect is on line 9.'
 		count: 1
-		path: tests/Unit/FluentComplexTest.php
+		path: tests/Unit/FluentConditionTest.php
 
 	-
 		sniff: PSR1.Files.SideEffects.FoundWithSymbols

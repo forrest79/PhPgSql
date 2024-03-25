@@ -11,16 +11,15 @@ class QueryBuilderException extends Exception
 	public const NO_DATA_TO_UPDATE = 5;
 	public const DATA_CANT_CONTAIN_ARRAY = 6;
 	public const NO_MAIN_TABLE = 7;
-	public const BAD_PARAMS_COUNT = 8;
-	public const NO_CORRESPONDING_TABLE = 9;
-	public const SELECT_ALL_COLUMNS_CANT_BE_COMBINED_WITH_CONCRETE_COLUMN_FOR_INSERT_SELECT_WITH_COLUMN_DETECTION = 10;
-	public const MERGE_NO_USING = 11;
-	public const MERGE_NO_WHEN = 12;
-	public const ON_CONFLICT_NO_DO = 13;
-	public const ON_CONFLICT_DO_WITHOUT_DEFINITION = 14;
-	public const ON_CONFLICT_DO_UPDATE_SET_SINGLE_COLUMN_CAN_BE_ONLY_STRING = 15;
-	public const MISSING_COLUMN_ALIAS = 16;
-	public const CANT_COMBINE_DISTINCT_AND_DISTINCT_ON = 17;
+	public const NO_CORRESPONDING_TABLE = 8;
+	public const SELECT_ALL_COLUMNS_CANT_BE_COMBINED_WITH_CONCRETE_COLUMN_FOR_INSERT_SELECT_WITH_COLUMN_DETECTION = 9;
+	public const MERGE_NO_USING = 10;
+	public const MERGE_NO_WHEN = 11;
+	public const ON_CONFLICT_NO_DO = 12;
+	public const ON_CONFLICT_DO_WITHOUT_DEFINITION = 13;
+	public const ON_CONFLICT_DO_UPDATE_SET_SINGLE_COLUMN_CAN_BE_ONLY_STRING = 14;
+	public const MISSING_COLUMN_ALIAS = 15;
+	public const CANT_COMBINE_DISTINCT_AND_DISTINCT_ON = 16;
 
 
 	public static function badQueryType(string $type): self
@@ -62,12 +61,6 @@ class QueryBuilderException extends Exception
 	public static function noMainTable(): self
 	{
 		return new self('No main table defined.', self::NO_MAIN_TABLE);
-	}
-
-
-	public static function badParamsCount(string $condition, int $expected, int $actual): self
-	{
-		return new self(\sprintf('In condition \'%s\' is expected %d paramerters, but %d was passed.', $condition, $expected, $actual), self::BAD_PARAMS_COUNT);
 	}
 
 

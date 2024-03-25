@@ -11,21 +11,21 @@ use Forrest79\PhPgSql\Db;
  *   distinctOn: list<string>,
  *   tables: array<string, array{0: string, 1: string}>,
  *   table-types: array{main: string|NULL, from: list<string>, joins: list<string>, using: string|NULL},
- *   on-conditions: array<string, Complex>,
+ *   on-conditions: array<string, Condition>,
  *   lateral-tables: array<string, string>,
- *   where: Complex|NULL,
+ *   where: Condition|NULL,
  *   groupBy: array<string>,
- *   having: Complex|NULL,
+ *   having: Condition|NULL,
  *   orderBy: array<string|Db\Sql|Query>,
  *   limit: int|NULL,
  *   offset: int|NULL,
  *   combine-queries: list<array{0: string|Query|Db\Sql, 1: string}>,
  *   insert-columns: array<string>,
- *   insert-onconflict: array{columns-or-constraint: string|list<string>|FALSE|NULL, where: Complex|NULL, do: array<int|string, string|Db\Sql>|FALSE|NULL, do-where: Complex|NULL},
+ *   insert-onconflict: array{columns-or-constraint: string|list<string>|FALSE|NULL, where: Condition|NULL, do: array<int|string, string|Db\Sql>|FALSE|NULL, do-where: Condition|NULL},
  *   returning: array<int|string, string|int|Query|Db\Sql>,
  *   data: array<string, mixed>,
  *   rows: array<int, array<string, mixed>>,
- *   merge: list<array{0: string, 1: string|Db\Sql, 2: Complex|NULL}>,
+ *   merge: list<array{0: string, 1: string|Db\Sql, 2: Condition|NULL}>,
  *   with: array{queries: array<string, string|Query|Db\Sql>, queries-suffix: array<string, string>, queries-not-materialized: array<string, string>, recursive: bool},
  *   prefix: list<array<mixed>>,
  *   suffix: list<array<mixed>>
@@ -190,7 +190,7 @@ class QueryBuilder
 
 			$onConflictWhere = $queryParams[Query::PARAM_INSERT_ONCONFLICT][Query::INSERT_ONCONFLICT_WHERE];
 			if ($onConflictWhere !== NULL) {
-				$onConflict .= ' WHERE ' . $this->processComplex($onConflictWhere, $params);
+				$onConflict .= ' WHERE ' . $this->processCondition($onConflictWhere, $params);
 			}
 
 			$onConflict .= ' DO ';
@@ -220,7 +220,7 @@ class QueryBuilder
 
 				$onConflictDoWhere = $queryParams[Query::PARAM_INSERT_ONCONFLICT][Query::INSERT_ONCONFLICT_DO_WHERE];
 				if ($onConflictDoWhere !== NULL) {
-					$onConflict .= ' WHERE ' . $this->processComplex($onConflictDoWhere, $params);
+					$onConflict .= ' WHERE ' . $this->processCondition($onConflictDoWhere, $params);
 				}
 			}
 		}
@@ -348,7 +348,7 @@ class QueryBuilder
 			$usingAlias,
 			FALSE,
 			$params,
-		) . ' ON ' . $this->processComplex(
+		) . ' ON ' . $this->processCondition(
 			$queryParams[Query::PARAM_ON_CONDITIONS][$usingAlias],
 			$params,
 		);
@@ -367,7 +367,7 @@ class QueryBuilder
 			$merge .= ' MATCHED';
 
 			if ($condition !== NULL) {
-				$merge .= ' AND ' . $this->processComplex($condition, $params);
+				$merge .= ' AND ' . $this->processCondition($condition, $params);
 			}
 
 			if ($then instanceof Db\Sql) {
@@ -546,7 +546,7 @@ class QueryBuilder
 					throw Exceptions\QueryBuilderException::noOnCondition($tableAlias);
 				}
 
-				$joins[] = $table . ' ON ' . $this->processComplex(
+				$joins[] = $table . ' ON ' . $this->processCondition(
 					$queryParams[Query::PARAM_ON_CONDITIONS][$tableAlias],
 					$params,
 				);
@@ -571,7 +571,7 @@ class QueryBuilder
 			return '';
 		}
 
-		return ' WHERE ' . $this->processComplex($where, $params);
+		return ' WHERE ' . $this->processCondition($where, $params);
 	}
 
 
@@ -601,7 +601,7 @@ class QueryBuilder
 			return '';
 		}
 
-		return ' HAVING ' . $this->processComplex($having, $params);
+		return ' HAVING ' . $this->processCondition($having, $params);
 	}
 
 
@@ -806,49 +806,10 @@ class QueryBuilder
 	 * @param list<mixed> $params
 	 * @throws Exceptions\QueryBuilderException
 	 */
-	private function processComplex(Complex $complex, array &$params): string
+	private function processCondition(Condition $condition, array &$params): string
 	{
-		$conditions = $complex->getConditions();
-		$withoutParentheses = \count($conditions) === 1;
-		$processedConditions = [];
-		foreach ($conditions as $conditionParams) {
-			if ($conditionParams instanceof Complex) {
-				$condition = \sprintf($withoutParentheses === TRUE ? '%s' : '(%s)', $this->processComplex($conditionParams, $params));
-			} else {
-				$condition = \array_shift($conditionParams);
-				\assert(\is_string($condition)); // first array item is SQL, next are mixed params
-				$cnt = \preg_match_all('/(?<!\\\\)\?/', $condition);
-				$cntParams = \count($conditionParams);
-				if (($cnt === 0) && ($cntParams === 1)) {
-					$param = \reset($conditionParams);
-					if (\is_array($param) || ($param instanceof Db\Sql)) {
-						$condition .= ' IN (?)';
-					} else if ($param === NULL) {
-						$condition .= ' IS NULL';
-						\array_shift($conditionParams);
-					} else {
-						$condition .= ' = ?';
-					}
-					$cnt = 1;
-				}
-
-				if ($cnt !== $cntParams) {
-					throw Exceptions\QueryBuilderException::badParamsCount($condition, $cnt, $cntParams);
-				}
-
-				if ($withoutParentheses === FALSE) {
-					$condition = '(' . $condition . ')';
-				}
-
-				foreach ($conditionParams as $param) {
-					$params[] = $param;
-				}
-			}
-
-			$processedConditions[] = $condition;
-		}
-
-		return \implode(' ' . $complex->getType() . ' ', $processedConditions);
+		$params[] = $condition;
+		return '?';
 	}
 
 

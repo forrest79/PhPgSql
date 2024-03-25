@@ -14,6 +14,11 @@ parameters:
 			path: %rootDir%/../../../src/Db/Row.php
 			count: 1
 
+		-
+			message: '#^Unsafe usage of new static\(\)\.$#'
+			path: %rootDir%/../../../src/Fluent/Condition.php
+			count: 2
+
 
 		# === This is OK (just for tests or benchmarks) ===
 
@@ -172,15 +177,20 @@ parameters:
 			count: 1
 
 		-
-			message: "#^Offset 'prefix'\\|'suffix' on array\\{select\\: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct\\: bool, distinctOn\\: list\\<string\\>, tables\\: array\\<string, array\\{string, string\\}\\>, table\\-types\\: array\\{main\\: string\\|null, from\\: list\\<string\\>, joins\\: list\\<string\\>, using\\: string\\|null\\}, on\\-conditions\\: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\>, lateral\\-tables\\: array\\<string, string\\>, where\\: Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\|null, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
+			message: "#^Offset 'prefix'\\|'suffix' on array\\{select\\: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct\\: bool, distinctOn\\: list\\<string\\>, tables\\: array\\<string, array\\{string, string\\}\\>, table\\-types\\: array\\{main\\: string\\|null, from\\: list\\<string\\>, joins\\: list\\<string\\>, using\\: string\\|null\\}, on\\-conditions\\: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\>, lateral\\-tables\\: array\\<string, string\\>, where\\: Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\|null, \\.\\.\\.\\} on left side of \\?\\? always exists and is not nullable\\.$#"
 			path: %rootDir%/../../../src/Fluent/QueryBuilder.php
 			count: 1
 
 		# === We know, that this can't happen ===
 
 		-
-			message: '#^Property Forrest79\\PhPgSql\\Fluent\\Complex::\$conditions \(list\<list\<mixed\>\|Forrest79\\PhPgSql\\Fluent\\Complex\>\) does not accept non\-empty\-array\<int, list\<mixed\>\|Forrest79\\PhPgSql\\Fluent\\Complex\>\.$#'
-			path: %rootDir%/../../../src/Fluent/Complex.php
+			message: '#^Property Forrest79\\PhPgSql\\Fluent\\Condition::\$conditions \(list\<list\<mixed\>\|Forrest79\\PhPgSql\\Fluent\\Condition\>\) does not accept non\-empty\-array\<int, list\<mixed\>\|Forrest79\\PhPgSql\\Fluent\\Condition\>\.$#'
+			path: %rootDir%/../../../src/Fluent/Condition.php
+			count: 1
+
+		-
+			message: '#^Parameter \#2 \$expected of static method Forrest79\\PhPgSql\\Fluent\\Exceptions\\ConditionException::badParamsCount\(\) expects int, int(\<0, max\>)?\|false(\|null)? given\.$#' # (|null)? is for forward PHP 8 compatibility
+			path: %rootDir%/../../../src/Fluent/Condition.php
 			count: 1
 
 		-
@@ -198,15 +208,10 @@ parameters:
 			path: %rootDir%/../../../src/Db/RowIterator.php
 			count: 1
 
-		-
-			message: '#^Parameter \#2 \$expected of static method Forrest79\\PhPgSql\\Fluent\\Exceptions\\QueryBuilderException::badParamsCount\(\) expects int, int(\<0, max\>)?\|false(\|null)? given\.$#' # (|null)? is for forward PHP 8 compatibility
-			path: %rootDir%/../../../src/Fluent/QueryBuilder.php
-			count: 1
-
 		# === PHPStan imperfection ===
 
 		-
-			message: "#^Property Forrest79\\\\PhPgSql\\\\Fluent\\\\Query::\\$params \\(array\\{select: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct: bool, distinctOn: list\\<string\\>, tables: array\\<string, array\\{string, string\\}\\>, table\\-types: array\\{main: string\\|null, from: list\\<string\\>, joins: list\\<string\\>, using: string\\|null\\}, on\\-conditions: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\>, lateral\\-tables: array\\<string, string\\>, where: Forrest79\\\\PhPgSql\\\\Fluent\\\\Complex\\|null, \\.\\.\\.\\}\\) does not accept .+\\.$#"
+			message: "#^Property Forrest79\\\\PhPgSql\\\\Fluent\\\\Query::\\$params \\(array\\{select: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct: bool, distinctOn: list\\<string\\>, tables: array\\<string, array\\{string, string\\}\\>, table\\-types: array\\{main: string\\|null, from: list\\<string\\>, joins: list\\<string\\>, using: string\\|null\\}, on\\-conditions: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\>, lateral\\-tables: array\\<string, string\\>, where: Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\|null, \\.\\.\\.\\}\\) does not accept .+\\.$#"
 			path: src/Fluent/Query.php
 			count: 6
 

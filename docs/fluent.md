@@ -23,9 +23,10 @@ $query = $fluent
   ->select(['*'])
   ->from('users')
   ->where('id', 1)
-  ->createSqlQuery();
+  ->createSqlQuery()
+  ->createQuery();
 
-dump($query->getSql()); // (string) 'SELECT * FROM users WHERE id = ?'
+dump($query->getSql()); // (string) 'SELECT * FROM users WHERE id = $1'
 dump($query->getParams()); // (array) [1]
 ```
 
@@ -79,25 +80,25 @@ Every query is `SELECT` at first, until you call `->insert(...)`, `->update(...)
 - `from($from, ?string $alias = NULL)` - defines table for `SELECT` query. `$from` can be simple `string` or other `Query` or `Db\Sql`.
 
 
-- `join($join, ?string $alias = NULL, $onCondition = NULL)` (or `innerJoin(...)`/`leftJoin(...)`/`leftOuterJoin(...)`/`rightJoin(...)`/`rightOuterJoin(...)`/`fullJoin(...)`/`fullOuterJoin(...)`) - joins table or query. You must provide alias if you want to add more conditions to `ON`. `$join` can be simple string or other `Query` or `Db\Sql`. `$onCondition` can be simple `string` or other `Complex` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters. 
+- `join($join, ?string $alias = NULL, $onCondition = NULL)` (or `innerJoin(...)`/`leftJoin(...)`/`leftOuterJoin(...)`/`rightJoin(...)`/`rightOuterJoin(...)`/`fullJoin(...)`/`fullOuterJoin(...)`) - joins table or query. You must provide alias if you want to add more conditions to `ON`. `$join` can be simple string or other `Query` or `Db\Sql`. `$onCondition` can be simple `string` or other `Condition` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters. 
 
 
 - `crossJoin($join, ?string $alias = NULL)` - defines cross-join. `$join` can be simple string or other `Query` or `Db\Sql`. There is no `ON` condition.
 
 
-- `on(string $alias, $condition, ...$params)` - defines new `ON` condition for joins. More `ON` conditions for one join is connected with `AND`. If `$condition` is `string`, you can use `?` and parameters in `$params`. Otherwise `$condition` can be `Complex` or `Db\Sql`.
+- `on(string $alias, $condition, ...$params)` - defines new `ON` condition for joins. More `ON` conditions for one join is connected with `AND`. If `$condition` is `string`, you can use `?` and parameters in `$params`. Otherwise `$condition` can be `Condition` or `Db\Sql`.
 
 
 - `lateral(string $alias)` - make subquery lateral.
 
 
-- `where($condition, ...$params)` (or `having(...)`) - defines `WHERE` or `HAVING` conditions. you can provide condition as a `string`. When `string` condition is used, you can add `$parameters`. When in the condition is no `?` and only one parameter is used, comparison is made between condition and parameter. If parameter is scalar, simple `=` is used, for an `array` is used `IN` operator, the same applies ale for `Query` (`Fluent\Query` or `Db\Sql`). And for `NULL` is used `IS` operator. This could be handy when you want to use more parameter types in one condition. For example, you can provide `int` and `=` will be use and if you provide `array<int>` - `IN` operator will be used and the query will be working for the both parameter types. More complex conditions can be written manually as a `string` with `?` for parameters. Or you can use `Complex` or `Db\Sql` as condition. In this case, `$params` must be blank. All `where()` or `having()` calls is connected with logic `AND`.
+- `where($condition, ...$params)` (or `having(...)`) - defines `WHERE` or `HAVING` conditions. you can provide condition as a `string`. When `string` condition is used, you can add `$parameters`. When in the condition is no `?` and only one parameter is used, comparison is made between condition and parameter. If parameter is scalar, simple `=` is used, for an `array` is used `IN` operator, the same applies ale for `Query` (`Fluent\Query` or `Db\Sql`). And for `NULL` is used `IS` operator. This could be handy when you want to use more parameter types in one condition. For example, you can provide `int` and `=` will be use and if you provide `array<int>` - `IN` operator will be used and the query will be working for the both parameter types. More complex conditions can be written manually as a `string` with `?` for parameters. Or you can use `Condition` or `Db\Sql` as condition. In this case, `$params` must be blank. All `where()` or `having()` calls is connected with logic `AND`.
 
 
-- `whereIf(bool $ifCondition, $condition, ...$params)` - the same as classic `where` method, but this condition is omitted when `$ifCondition` is `FALSE`.
+- `whereIf(bool $ifCondition, $condition, ...$params)` - the same as classics `where` method, but this condition is omitted when `$ifCondition` is `FALSE`.
 
 
-- `whereAnd(array $conditions = []): Complex` (or `whereOr(...)` / `havingAnd(...)` / `havingOr()`) - with these methods, you can generate condition groups. Ale provided conditions are connected with logic `AND` for `whereAnd()` and `havingAnd()` and with logic `OR` for `whereOr()` and `havingOr()`. All these methods return `Complex` object (more about this later). `$conditions` items can be simple `string`, another `array` (this is a little bit magic - this works as `where()`/`having()` method - first item in this `array` is conditions and next items are parameters), `Complex` or `Db\Sql`. 
+- `whereAnd(array $conditions = []): Condition` (or `whereOr(...)` / `havingAnd(...)` / `havingOr()`) - with these methods, you can generate condition groups. Ale provided conditions are connected with logic `AND` for `whereAnd()` and `havingAnd()` and with logic `OR` for `whereOr()` and `havingOr()`. All these methods return `Condition` object (more about this later). `$conditions` items can be simple `string`, another `array` (this is a little bit magic - this works as `where()`/`having()` method - first item in this `array` is conditions and next items are parameters), `Condition` or `Db\Sql`. 
 
 
 - `groupBy(string ...$columns)` - generates `GROUP BY` statement, one or more `string` parameters must be provided.
@@ -124,7 +125,7 @@ Every query is `SELECT` at first, until you call `->insert(...)`, `->update(...)
 - `rows(array $rows)` - this method can be used to insert multiple rows in one query. `$rows` is an `array` of arrays. Each array is one row (the same as for the `values()` method). All rows must have the same columns. Method can be called multiple and all rows are merged.
 
 
-- `onConflict($columnsOrConstraint = NULL, $where = NULL)` - this method can start `ON CONFLICT` statement for `INSERT`. When `array` is used as the `$columnsOrConstraint`, the list of columns is used, when `string` is used, constraint is used. This parameter can be completely omitted. Where condition `$where` can be defined only for the list of columns and can be simple `string` or other `Complex` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters.
+- `onConflict($columnsOrConstraint = NULL, $where = NULL)` - this method can start `ON CONFLICT` statement for `INSERT`. When `array` is used as the `$columnsOrConstraint`, the list of columns is used, when `string` is used, constraint is used. This parameter can be completely omitted. Where condition `$where` can be defined only for the list of columns and can be simple `string` or other `Condition` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters.
 
 
 - `doUpdate(array $set, $where = NULL)` - if conflict is detected, `UPDATE` is made instead of `INSERT`. Items od array `$set` can be defined in three ways. When only a `string` value is used (or key is an integer), this value is interpreted as `UPDATE SET value = EXCLUDED.value`. Only strings can be used without a key. When the array item has a `string` key, then `string` or `Db\Sql` value can be used, and now you must define a concrete statement to set (i.e., `['column' => 'EXCLUDED.column || source_table.column2']` is interpreted as `UPDATE SET column = EXCLUDED.column || source_table.column2`). `Db\Sql` can be used if you need to use parameters.
@@ -148,13 +149,13 @@ Every query is `SELECT` at first, until you call `->insert(...)`, `->update(...)
 - `merge(?string $into = NULL, ?string $alias = NULL)` - set query for merge. If the main table is not set, you must set it or rewrite with the `$into` parameter. `$alias` can be provided.
 
 
-- `using($dataSource, ?string $alias = NULL, $onCondition = NULL)` - set a data source for a merge command. `$dataSource` can be simple string, `Db\Sql\Query` or `Fluent\Query`. `$onCondition` can be simple `string` or other `Complex` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters. On condition can be added or extended with the `on()` method.
+- `using($dataSource, ?string $alias = NULL, $onCondition = NULL)` - set a data source for a merge command. `$dataSource` can be simple string, `Db\Sql\Query` or `Fluent\Query`. `$onCondition` can be simple `string` or other `Condition` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters. On condition can be added or extended with the `on()` method.
 
 
-- `whenMatched($then, $onCondition = NULL)` - add matched branch to a merge command. `$then` is simple string or `Db\Sql` and `$onCondition` can be simple `string` or other `Complex` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters.
+- `whenMatched($then, $onCondition = NULL)` - add matched branch to a merge command. `$then` is simple string or `Db\Sql` and `$onCondition` can be simple `string` or other `Condition` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters.
 
 
-- `whenNotMatched($then, $onCondition = NULL)` - add not matched branch to a merge command. `$then` is simple string or `Db\Sql` and `$onCondition` can be simple `string` or other `Complex` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters.
+- `whenNotMatched($then, $onCondition = NULL)` - add not matched branch to a merge command. `$then` is simple string or `Db\Sql` and `$onCondition` can be simple `string` or other `Condition` or `Db\Sql`. `Db\Sql` can be used for some complex expression, where you need to use `?` and parameters.
 
 
 - `truncate(?string $table = NULL)` - truncates table. If the main table is not set, you must provide/rewrite it with the `$table` parameter.
@@ -247,52 +248,52 @@ dump($queryE); // (Query) (SELECT column1, column2) UNION (SELECT column FROM ta
 
 ### Complex conditions
 
-Every condition (`WHERE`/`HAVING`/`ON`) are internally handled as the `Complex` object. With this, you can define really complex conditions connected with a logic `AND` or `OR`. One condition can be simple `string`, can have one argument with `=`/`IN`/`NULL`/`bool` detection or can have many arguments using `?` and parameters.
+Every condition (`WHERE`/`HAVING`/`ON`) are internally handled as the `Condition` object. With this, you can define really complex conditions connected with a logic `AND` or `OR`. One condition can be simple `string`, can have one argument with `=`/`IN`/`NULL`/`bool` detection or can have many arguments using `?` and parameters.
 
-Complex is a list of conditions that are all connected with `AND` or `OR`. The magic is, that condition can be also another complex with different type (`AND` or `OR`).
+`Condition` is a list of conditions that are all connected with `AND` or `OR`. The magic is, that condition can be also another complex with different type (`AND` or `OR`).
 
-Complex can be created with the static factory methods `Complex::createAnd(...)` or `Complex::createOr(...)`. The first argument can be an `array` with the condition list. New condition can be inserted with the `add(...)` method.
+`Condition` can be created with the static factory methods `Condition::createAnd(...)` or `Condition::createOr(...)`. The first argument can be an `array` with the condition list. New condition can be inserted with the `add(...)` method.
 
-With methods `addComplexAnd(...)` or `addComplexOr(...)` you can add new `Complex` object to the condition list and this new `Complex` object is returned. These `Complex` objects are connected into a tree structure (and can be connected also to the `Query` object). When you need to use simply fluent interface, you can use `parent()` method, that returns parent `Complex` or `query()` that returns connected `Query` object.
+With methods `addAndCondtions(...)` or `addOrCondtions(...)` you can add new `Condition` object to the condition list and this new `Condition` object is returned. These `Condition` objects are connected into a tree structure (and can be connected also to the `Query` object). When you need to use simply fluent interface, you can use `parent()` method, that returns parent `Condition` or `query()` that returns connected `Query` object.
 
 Method `getType()` returns `AND` or `OR` and `getConditions()` returns the list of all conditions. You will probably don't need these methods at all.
 
-`Complex` also implements `ArrayAccess`, so you can add a new condition with simple `$complex[] = ...` syntax, get concrete condition with `$condtition = $complex[...]` or remove one condition with the `unset($complex[...])`.
+`Condition` also implements `ArrayAccess`, so you can add a new condition with simple `$condition[] = ...` syntax, get concrete condition with `$concreteCondition = $condition[...]` or remove one condition with the `unset($condition[...])`.
 
 ```php
 $param = [1, 2];
 
-$complex = Forrest79\PhPgSql\Fluent\Complex::createAnd([
+$condition = Forrest79\PhPgSql\Fluent\Condition::createAnd([
   'column1 = 1',
   ['column2', TRUE],
   ['column3', $param],
   ['column4 < ? OR column5 != ?', 5, 10],
 ]);
 
-$complex->add('column1', 81);
-$complex->add('column4 < ? OR column5 != ?', 5, 10);
-$complex[] = ['column1', 71]; // column1 = 1
+$condition->add('column1', 81);
+$condition->add('column4 < ? OR column5 != ?', 5, 10);
+$condition[] = ['column1', 71]; // column1 = 1
 
-$complex->addComplexOr([
+$condition->addOrBranch([
     'column != TRUE'
 ])
   ->add('column2', TRUE)
-  ->parent() // this return original complex object
+  ->parent() // this return original condition object
     ->add('column3 < 1');
 ```
 
-This defined complex can be used in `where($complex)` method, `having($complex)` method or as `on($complex)`/`join(..., $complex)` condition.
+This defined condition can be used in `where($condition)` method, `having($condition)` method or as `on($condition)`/`join(..., $condition)` condition.
 
-To create complex condition in a simpler way, there are methods `whereAnd()`/`whereOr()`/`havingAnd()`/`havingOr()` on the `Query` that return a new `Complex` connected to a query.
+To create condition in a simpler way, there are methods `whereAnd()`/`whereOr()`/`havingAnd()`/`havingOr()` on the `Query` that return a new `Condition` connected to a query.
 
 ```php
 $query = $connection
   ->createQuery()
   ->table('users')
-  ->whereOr() // add new OR (return Complex object)
+  ->whereOr() // add new OR (return Condition object)
     ->add('column', 1) // this is add to OR
     ->add('column2', [2, 3]) // this is also add to OR
-    ->addComplexAnd() // this is also add to OR and can contains more ANDs
+    ->addAndBranch() // this is also add to OR and can contains more ANDs
       ->add('column', $connection->createQuery()->select([1])) // this is add to AND
       ->add('column2 = ANY(?)', Forrest79\PhPgSql\Db\Sql\Query::create('SELECT 2')) // this is add to AND
       ->parent() // get original OR
@@ -487,7 +488,7 @@ $insertedOrUpdatedWithWhereOnConflictRows = $connection
     'id' => '20',
     'nick' => 'James',
   ])
-  ->onConflict(['id'], Forrest79\PhPgSql\Fluent\Complex::createAnd()->add('users.nick != ?', 'James'))
+  ->onConflict(['id'], Forrest79\PhPgSql\Fluent\Condition::createAnd()->add('users.nick != ?', 'James'))
   ->doUpdate(['nick'])
   ->getAffectedRows();
 
@@ -504,7 +505,7 @@ $insertedOrUpdatedWithWhereOnUpdateRows = $connection
     'nick' => 'Margaret',
   ])
   ->onConflict(['id'])
-  ->doUpdate(['nick'], Forrest79\PhPgSql\Fluent\Complex::createAnd()->add('users.nick != ?', 'Margaret'))
+  ->doUpdate(['nick'], Forrest79\PhPgSql\Fluent\Condition::createAnd()->add('users.nick != ?', 'Margaret'))
   ->getAffectedRows();
 
 dump($insertedOrUpdatedWithWhereOnUpdateRows); // (integer) 1
@@ -667,7 +668,7 @@ $query = $connection
   ->merge('wines', 'w')
   ->using('wine_stock_changes', 's', 's.winename = w.winename')
   ->whenNotMatched('INSERT VALUES(s.winename, s.stock_delta)', 's.stock_delta > 0')
-  ->whenMatched('UPDATE SET stock = w.stock + s.stock_delta', Forrest79\PhPgSql\Fluent\Complex::createAnd()->add('w.stock + s.stock_delta > ?', 0))
+  ->whenMatched('UPDATE SET stock = w.stock + s.stock_delta', Forrest79\PhPgSql\Fluent\Condition::createAnd()->add('w.stock + s.stock_delta > ?', 0))
   ->whenMatched('DELETE');
 
 dump($query); // (Query) MERGE INTO wines AS w USING wine_stock_changes AS s ON s.winename = w.winename WHEN NOT MATCHED AND s.stock_delta > 0 THEN INSERT VALUES(s.winename, s.stock_delta) WHEN MATCHED AND w.stock + s.stock_delta > $1 THEN UPDATE SET stock = w.stock + s.stock_delta WHEN MATCHED THEN DELETE [Params: (array) [0]]
