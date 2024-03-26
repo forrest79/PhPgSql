@@ -121,7 +121,7 @@ final class QueryTest extends Tests\TestCase
 	{
 		$query = Db\Sql\Query::create('SELECT * FROM table WHERE column = ?', Tests\TestEnum::One)->createQuery();
 		Tester\Assert::same('SELECT * FROM table WHERE column = $1', $query->getSql());
-		Tester\Assert::same([1], $query->getParams()); // @todo backward compatibility with PHP < 8.1: Tests\TestEnum::One->value
+		Tester\Assert::same([Tests\TestEnum::One->value], $query->getParams());
 	}
 
 
@@ -129,7 +129,7 @@ final class QueryTest extends Tests\TestCase
 	{
 		$query = Db\Sql\Query::create('SELECT * FROM table WHERE column IN (?)', [Tests\TestEnum::Two, Tests\TestEnum::One])->createQuery();
 		Tester\Assert::same('SELECT * FROM table WHERE column IN ($1, $2)', $query->getSql());
-		Tester\Assert::same([2, 1], $query->getParams()); // @todo backward compatibility with PHP < 8.1: Tests\TestEnum::Two->value, Tests\TestEnum::One->value
+		Tester\Assert::same([Tests\TestEnum::Two->value, Tests\TestEnum::One->value], $query->getParams());
 	}
 
 

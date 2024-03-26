@@ -1,9 +1,6 @@
 <?xml version="1.0"?>
 <ruleset name="PhpFpmRequest">
-	<rule ref="./vendor/forrest79/phpcs/Forrest79CodingStandard/ruleset-fully-qualified-global.xml">
-		<exclude name="SlevomatCodingStandard.Attributes.AttributesOrder"/>
-		<exclude name="SlevomatCodingStandard.Functions.DisallowTrailingCommaInClosureUse"/>
-	</rule>
+	<rule ref="./vendor/forrest79/phpcs/Forrest79CodingStandard/ruleset.xml"/>
 
 	<rule ref="SlevomatCodingStandard.Files.TypeNameMatchesFileName">
 		<properties>

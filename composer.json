@@ -15,7 +15,7 @@
 		"ext-pgsql": "^8.1"
 	},
 	"require-dev": {
-		"forrest79/phpcs": "^1.5",
+		"forrest79/phpcs": "^1.6",
 		"forrest79/phpcs-ignores": "^0.5",
 		"forrest79/phpgsql-phpstan": "^1.7",
 		"nette/tester": "^2.5",
@@ -40,7 +40,7 @@
 		"tests": "tests/run-tests tests",
 		"coverage": "tests/collect-coverage tests",
 		"benchmarks": "benchmarks/run-benchmarks.php",
-		"phpcs": "vendor/bin/phpcs --bootstrap=vendor/forrest79/phpcs-ignores/src/bootstrap.php -s src tests benchmarks",
+		"phpcs": "vendor/bin/phpcs --bootstrap=vendor/forrest79/phpcs-ignores/src/bootstrap-outdated.php -s src tests benchmarks",
 		"phpstan": "vendor/bin/phpstan analyse src tests benchmarks"
 	},
 	"config": {
