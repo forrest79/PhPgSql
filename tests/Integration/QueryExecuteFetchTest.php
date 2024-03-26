@@ -26,6 +26,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(name) VALUES(?)', 'phpgsql');
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id', 'name'])
 			->from('test');
 
@@ -52,6 +53,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(id) VALUES(?)', 999);
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id'])
 			->from('test')
 			->limit(1);
@@ -77,6 +79,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(type, name) SELECT generate_series, \'name\' || generate_series FROM generate_series(3, 1, -1)');
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id', 'type', 'name'])
 			->from('test')
 			->orderBy('id');
@@ -106,6 +109,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(type, name) SELECT generate_series, \'name\' || generate_series FROM generate_series(3, 1, -1)');
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id', 'type', 'name'])
 			 ->from('test')
 			 ->orderBy('id');
@@ -132,6 +136,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(name) SELECT \'name\' || generate_series FROM generate_series(3, 1, -1)');
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id', 'name'])
 			->from('test')
 			->orderBy('id');
@@ -146,7 +151,7 @@ final class QueryExecuteFetchTest extends TestCase
 
 	public function testAsyncExecute(): void
 	{
-		$asyncQuery = $this->connection->select(['1'])->asyncExecute();
+		$asyncQuery = $this->connection->createQuery()->select(['1'])->asyncExecute();
 
 		$result = $asyncQuery->getNextResult();
 		$data = $result->fetchSingle();
@@ -167,6 +172,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(name) SELECT \'name\' || generate_series FROM generate_series(3, 1, -1)');
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id', 'name'])
 			->from('test')
 			->orderBy('id');
@@ -197,6 +203,7 @@ final class QueryExecuteFetchTest extends TestCase
 		');
 
 		$query = $this->connection
+			->createQuery()
 			->insert('test', columns: ['name'])
 			->select(['\'name\' || generate_series FROM generate_series(3, 1, -1)']);
 
@@ -217,6 +224,7 @@ final class QueryExecuteFetchTest extends TestCase
 		$this->connection->query('INSERT INTO test(id) VALUES(?)', 999);
 
 		$query = $this->connection
+			->createQuery()
 			->select(['id'])
 			->from('test')
 			->limit(1);
@@ -234,14 +242,14 @@ final class QueryExecuteFetchTest extends TestCase
 	public function testFreeWithoutResult(): void
 	{
 		Tester\Assert::exception(function (): void {
-			$this->connection->select([1])->free();
+			$this->connection->createQuery()->select([1])->free();
 		}, Fluent\Exceptions\QueryException::class, NULL, Fluent\Exceptions\QueryException::YOU_MUST_EXECUTE_QUERY_BEFORE_THAT);
 	}
 
 
 	public function testUpdateExecuted(): void
 	{
-		$query = $this->connection->select([1]);
+		$query = $this->connection->createQuery()->select([1]);
 
 		$query->fetchSingle();
 
@@ -253,7 +261,7 @@ final class QueryExecuteFetchTest extends TestCase
 
 	public function testCloneExecuted(): void
 	{
-		$originalQuery = $this->connection->select([1]);
+		$originalQuery = $this->connection->createQuery()->select([1]);
 
 		$result1 = $originalQuery->execute();
 

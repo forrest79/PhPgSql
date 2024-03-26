@@ -47,6 +47,7 @@ But you don't want to do this so complicatedly. Use `Fluent\Connection` to creat
 
 ```php
 $userNick = $connection
+  ->createQuery()
   ->select(['nick'])
   ->from('users')
   ->where('id', 2)
@@ -164,14 +165,14 @@ Every query is `SELECT` at first, until you call `->insert(...)`, `->update(...)
 If you want to create a copy of existing query, just use `clone`:
 
 ```php
-$query = $connection->select(['nick'])->from('users');
+$query = $connection->createQuery()->select(['nick'])->from('users');
 $newQuery = clone $query;
 ```
 
 `Query` internally saves own state for the `QueryBuilder`. You can check, if some internal state is already set with method `has(...)`. Use `Query::PARAM_*` constants as a parameter. You can also reset some settings with `reset(...)` method.
 
 ```php
-$query = $connection->where('column', TRUE);
+$query = $connection->createQuery()->where('column', TRUE);
 
 dump($query->has($query::PARAM_WHERE)); // (bool) TRUE
 
@@ -186,6 +187,7 @@ If you want to create an alias for a column in `SELECT`, use `string` key in `ar
 
 ```php
 $query = $connection
+  ->createQuery()
   ->select(['column1', 'alias' => 'column_with_alias']);
 
 dump($query); // (Query) SELECT column1, column_with_alias AS \"alias\"
@@ -195,22 +197,26 @@ To almost every parameter (`select()`, `where()`, `having()`, `on()`, `orderBy()
 
 ```php
 $query = $connection
+  ->createQuery()
   ->select(['column'])
   ->from('table')
   ->limit(1);
 
 $queryA = $connection
+  ->createQuery()
   ->select(['c' => $query]);
 
 dump($queryA); // (Query) SELECT (SELECT column FROM table LIMIT $1) AS \"c\" [Params: (array) [1]]
 
 $queryB = $connection
+  ->createQuery()
   ->select(['column'])
   ->from($query, 'c');
 
 dump($queryB); // (Query) SELECT column FROM (SELECT column FROM table LIMIT $1) AS c [Params: (array) [1]]
 
 $queryC = $connection
+  ->createQuery()
   ->select(['column'])
   ->from('table', 't')
   ->join($query, 'c', 'c.id = t.id');
@@ -218,6 +224,7 @@ $queryC = $connection
 dump($queryC); // (Query) SELECT column FROM table AS t INNER JOIN (SELECT column FROM table LIMIT $1) AS c ON c.id = t.id [Params: (array) [1]]
 
 $queryD = $connection
+  ->createQuery()
   ->select(['column'])
   ->from('table', 't')
   ->where('id IN (?)', $query);
@@ -225,6 +232,7 @@ $queryD = $connection
 dump($queryD); // (Query) SELECT column FROM table AS t WHERE id IN (SELECT column FROM table LIMIT $1) [Params: (array) [1]]
 
 $queryE = $connection
+  ->createQuery()
   ->select(['column1', 'column2'])
   ->union($query);
 
@@ -272,7 +280,9 @@ This defined complex can be used in `where($complex)` method, `having($complex)`
 To create complex condition in a simplier way, there are methods `whereAnd()`/`whereOr()`/`havingAnd()`/`havingOr()` on the `Query` that return a new `Complex` connected to a query.
 
 ```php
-$query = $connection->table('users')
+$query = $connection
+  ->createQuery()
+  ->table('users')
   ->whereOr() // add new OR (return Complex object)
     ->add('column', 1) // this is add to OR
     ->add('column2', [2, 3]) // this is also add to OR
@@ -293,6 +303,7 @@ You can insert a simple row:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'nick' => 'James',
@@ -310,6 +321,7 @@ $result = $query->execute();
 dump($result->getAffectedRows()); // (integer) 1
 
 $insertedRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'nick' => 'Jimmy',
@@ -323,6 +335,7 @@ Or you can use the returning statement:
 
 ```php
 $insertedData = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'nick' => 'Jimmy',
@@ -337,6 +350,7 @@ You can use multi-insert too:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->insert('users')
   ->rows([
     ['nick' => 'Luis'],
@@ -355,6 +369,7 @@ Here are column names detected from the first row. You can also pass the columns
 
 ```php
 $insertedRows = $connection
+  ->createQuery()
   ->insert('users', columns: ['nick', 'age'])
   ->rows([
     ['Luis', 31],
@@ -370,6 +385,7 @@ And of course, you can use `INSERT` - `SELECT`:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->insert('users', columns: ['nick'])
   ->select(['name' || '\'_\'' || 'age'])
   ->from('departments')
@@ -386,6 +402,7 @@ And if you're using the same names for columns in `INSERT` and `SELECT`, you can
 
 ```php
 $insertedRows = $connection
+  ->createQuery()
   ->insert('users')
   ->select(['nick'])
   ->from('users', 'u2')
@@ -405,6 +422,7 @@ Simple use - check column `id` for conflict update `nick` is conflict is detecte
 
 ```php
 $insertedOrUpdatedRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'id' => '20',
@@ -421,6 +439,7 @@ The same with `WHERE` statement on conflicted columns.
 
 ```php
 $insertedOrUpdatedWithWhereOnConflictRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'id' => '20',
@@ -436,6 +455,7 @@ The same with `WHERE` statement on `UPDATE SET`.
 
 ```php
 $insertedOrUpdatedWithWhereOnUpdateRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'id' => '20',
@@ -452,6 +472,7 @@ And to ignore conflicting inserts:
 
 ```php
 $insertedOrUpdatedDoNothingRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'id' => '1',
@@ -468,6 +489,7 @@ To use constraint name in `ON CONFLICT`:
 
 ```php
 $insertedOrUpdatedWithConstraintRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'id' => '20',
@@ -484,6 +506,7 @@ And the last to use manully `SET` with string (here we can use alias for `INTO` 
 
 ```php
 $insertedOrUpdatedRows = $connection
+  ->createQuery()
   ->insert('users', 'u')
   ->values([
     'id' => '20',
@@ -496,6 +519,7 @@ $insertedOrUpdatedRows = $connection
 dump($insertedOrUpdatedRows); // (integer) 1
 
 $insertedOrUpdatedRows = $connection
+  ->createQuery()
   ->insert('users')
   ->values([
     'id' => '20',
@@ -514,6 +538,7 @@ You can use simple update:
 
 ```php
 $updatedRows = $connection
+  ->createQuery()
   ->update('users')
   ->set([
     'nick' => 'Thomas',
@@ -530,6 +555,7 @@ Or complex with from (and joins, ...):
 
 ```php
 $query = $connection
+  ->createQuery()
   ->update('users', 'u')
   ->set([
     'nick' => Forrest79\PhPgSql\Db\Sql\Literal::create('u.nick || \' - \' || d.name'),
@@ -550,6 +576,7 @@ Simple delete with a condition:
 
 ```php
 $deleteRows = $connection
+  ->createQuery()
   ->delete('users')
   ->where('id', 1)
   ->getAffectedRows();
@@ -567,6 +594,7 @@ Simple use can look like:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->merge('customer_account', 'ca')
   ->using('recent_transactions', 't', 't.customer_id = ca.customer_id')
   ->whenMatched('UPDATE SET balance = balance + transaction_value')
@@ -579,6 +607,7 @@ The `ON` condition can be used with the `on()` method:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->merge('customer_account', 'ca')
   ->using('recent_transactions', 't')
   ->on('t', 't.customer_id = ca.customer_id')
@@ -592,6 +621,7 @@ The `WHEN (NOT) MATCHED` branches can have conditions:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->merge('wines', 'w')
   ->using('wine_stock_changes', 's', 's.winename = w.winename')
   ->whenNotMatched('INSERT VALUES(s.winename, s.stock_delta)', 's.stock_delta > 0')
@@ -652,6 +682,7 @@ And this is how this could be prepared with the fluent interface:
 
 ```php
 $updateRow = $connection
+  ->createQuery()
   ->merge('users', 'u')
   ->using('(SELECT 1)', 'x', 'u.nick = $1')
   ->whenMatched('UPDATE SET active = $2')
@@ -672,6 +703,7 @@ table($updatedRows);
 */
 
 $insertRow = $connection
+  ->createQuery()
   ->merge('users', 'u')
   ->using('(SELECT 1)', 'x', 'u.nick = $1')
   ->whenMatched('UPDATE SET active = $2')
@@ -700,10 +732,12 @@ Just with table name:
 
 ```php
 $connection
+  ->createQuery()
   ->truncate('user_departments')
   ->execute();
 
 $query = $connection
+  ->createQuery()
   ->table('departments')
   ->truncate()
   ->suffix('CASCADE'); // generate `TRUNCATE departments CASCADE`
@@ -721,6 +755,7 @@ You can use `WITH` with a simple string query, or defined it with `Db\Sql\Query`
 
 ```php
 $query = $connection
+  ->createQuery()
   ->with('active_users', 'SELECT id, nick, age, height_cm FROM users WHERE active = TRUE')
   ->with('active_departments', new Forrest79\PhPgSql\Db\Sql\Query('SELECT id FROM departments WHERE active = ?', [TRUE]))
   ->select(['au.id', 'au.nick', 'au.age', 'au.height_cm'])
@@ -737,6 +772,7 @@ You can define `WITH` query recursive:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->with('t(n)', 'VALUES (1) UNION ALL SELECT n + 1 FROM t WHERE n < 100')
   ->recursive()
   ->select(['sum(n)'])
@@ -751,6 +787,7 @@ Or with some special suffix definition:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->with(
     'search_tree(id, link, data)',
     'SELECT t.id, t.link, t.data FROM tree AS t UNION ALL SELECT t.id, t.link, t.data FROM tree AS t, search_tree AS st WHERE t.id = st.link', 
@@ -767,6 +804,7 @@ Or not materialized:
 
 ```php
 $query = $connection
+  ->createQuery()
   ->with('w', 'SELECT * FROM big_table', NULL, TRUE)
   ->select(['*'])
   ->from('w', 'w1')
@@ -789,6 +827,7 @@ You can update your query till `execute()` is call, after that, no updates on qu
 
 ```php
 $query = $connection
+  ->createQuery()
   ->select(['nick'])
   ->from('users')
   ->where('id', 1);
@@ -798,6 +837,7 @@ $userNick = $query->fetchSingle();
 dump($userNick); // (string) 'Bob'
 
 $connection
+  ->createQuery()
   ->update('users')
   ->set(['nick' => 'Thomas'])
   ->where('id', 1)
@@ -814,6 +854,7 @@ You can also run the async query with the `asyncExecute()` method.
 
 ```php
 $asyncQuery = $connection
+  ->createQuery()
   ->select(['nick'])
   ->from('users')
   ->where('id', 1)
@@ -839,20 +880,20 @@ The second you can extend is the `Query` or `QueryExecute` object. For example, 
 ```php
 class Query extends Forrest79\PhPgSql\Fluent\QueryExecute
 {
-	private $connection;
+  private $connection;
 
-	public function __construct(Forrest79\PhPgSql\Fluent\QueryBuilder $queryBuilder, Forrest79\PhPgSql\Db\Connection $connection)
-	{
-		$this->connection = $connection;
-		parent::__construct($queryBuilder, $connection);
-	}
+  public function __construct(Forrest79\PhPgSql\Fluent\QueryBuilder $queryBuilder, Forrest79\PhPgSql\Db\Connection $connection)
+  {
+    $this->connection = $connection;
+    parent::__construct($queryBuilder, $connection);
+  }
 
-	public function exists(): bool
-	{
-		return (bool) $this->connection
-			->query('SELECT EXISTS (?)', $this->select(['TRUE'])->createSqlQuery())
-			->fetchSingle();
-	}
+  public function exists(): bool
+  {
+    return (bool) $this->connection
+      ->query('SELECT EXISTS (?)', $this->select(['TRUE'])->createSqlQuery())
+      ->fetchSingle();
+  }
 }
 
 $query1 = (new Query(new Forrest79\PhPgSql\Fluent\QueryBuilder(), $connection))->from('users');
@@ -870,6 +911,7 @@ Of course, you want to use your own query right from the connection. So overwrit
 
 ```php
 $query = $connection
+  ->createQuery()
   ->select(['nick'])
   ->from('users')
   ->where('id', 1)
@@ -884,10 +926,12 @@ $query->execute();
 
 ```php
 $innerQuery = $connection
+  ->createQuery()
   ->select(['id', 'nick'])
   ->from('users');
 
 $query = $connection
+  ->createQuery()
   ->prefix('WITH usr AS (?)', $innerQuery)
   ->select(['nick'])
   ->from('usr')
@@ -902,6 +946,7 @@ $query->execute();
 
 ```php
 $query = $connection
+  ->createQuery()
   ->select(['is_old' => Forrest79\PhPgSql\Db\Sql\Expression::create('age > ?', 37)])
   ->from('users')
   ->orderBy(Forrest79\PhPgSql\Db\Sql\Expression::create('CASE WHEN age > ? THEN 1 ELSE 2 END', 36));
@@ -913,6 +958,7 @@ $query->execute();
 
 ```php
 $query = $connection
+  ->createQuery()
   ->update('users')
   ->set([
     'nick' => Forrest79\PhPgSql\Db\Sql\Expression::create('CASE WHEN age > ? THEN \'old \' || nick ELSE \'young \' || nick END', 36),

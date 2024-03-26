@@ -7,7 +7,7 @@ use Forrest79\PhPgSql\Db;
 /**
  * @phpstan-import-type QueryParams from QueryBuilder
  */
-class Query implements Sql
+class Query
 {
 	public const QUERY_SELECT = 'select';
 	public const QUERY_INSERT = 'insert';
