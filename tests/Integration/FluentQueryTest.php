@@ -17,7 +17,7 @@ final class FluentQueryTest extends TestCase
 
 	public function testSelectBoolNull(): void
 	{
-		$query = $this->connection->select(['is_true' => TRUE, 'is_false' => FALSE, 'is_null' => NULL]);
+		$query = $this->connection->createQuery()->select(['is_true' => TRUE, 'is_false' => FALSE, 'is_null' => NULL]);
 
 		$row = $query->fetch();
 		if ($row === NULL) {
