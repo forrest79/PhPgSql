@@ -506,7 +506,7 @@ class MyOwnResult extends Forrest79\PhPgSql\Db\Result
 
 class MyOwnResultFactory implements Forrest79\PhPgSql\Db\ResultFactory
 {
-  public function createResult(PgSql\Result $queryResource, Forrest79\PhPgSql\Db\Query $query, Forrest79\PhPgSql\Db\RowFactory $rowFactory, Forrest79\PhPgSql\Db\DataTypeParser $dataTypeParser, array|NULL $dataTypesCache): Forrest79\PhPgSql\Db\Result
+  public function create(PgSql\Result $queryResource, Forrest79\PhPgSql\Db\Query $query, Forrest79\PhPgSql\Db\RowFactory $rowFactory, Forrest79\PhPgSql\Db\DataTypeParser $dataTypeParser, array|NULL $dataTypesCache): Forrest79\PhPgSql\Db\Result
   {
     return new MyOwnResult($queryResource, $query, $rowFactory, $dataTypeParser, $dataTypesCache);
   }
@@ -620,7 +620,7 @@ class MyOwnRow extends Forrest79\PhPgSql\Db\Row
 
 class MyOwnRowFactory implements Forrest79\PhPgSql\Db\RowFactory
 {
-  public function createRow(Forrest79\PhPgSql\Db\ColumnValueParser $columnValueParser, array $rawValues): Forrest79\PhPgSql\Db\Row
+  public function create(Forrest79\PhPgSql\Db\ColumnValueParser $columnValueParser, array $rawValues): Forrest79\PhPgSql\Db\Row
   {
       return new MyOwnRow($columnValueParser, $rawValues);
   }

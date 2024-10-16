@@ -11,7 +11,7 @@ class Basic implements Db\ResultFactory
 	/**
 	 * @param array<int, string>|NULL $dataTypesCache
 	 */
-	public function createResult(
+	public function create(
 		PgSql\Result $queryResource,
 		Db\Query $query,
 		Db\RowFactory $rowFactory,

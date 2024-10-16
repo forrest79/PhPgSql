@@ -26,9 +26,9 @@ class ResultBuilder
 	}
 
 
-	public function buildResult(PgSql\Result $resource, Query $query): Result
+	public function build(PgSql\Result $resource, Query $query): Result
 	{
-		$result = $this->getResultFactory()->createResult(
+		$result = $this->getResultFactory()->create(
 			$resource,
 			$query,
 			$this->getRowFactory(),

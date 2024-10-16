@@ -194,7 +194,7 @@ parameters:
 			count: 1
 
 		-
-			message: '#^Parameter \#2 \$rawValues of method Forrest79\\PhPgSql\\Db\\RowFactory::createRow\(\) expects array\<string, string\|null\>, array\<int\|string, string\|null\> given\.$#'
+			message: '#^Parameter \#2 \$rawValues of method Forrest79\\PhPgSql\\Db\\RowFactory::create\(\) expects array\<string, string\|null\>, array\<int\|string, string\|null\> given\.$#'
 			path: %rootDir%/../../../src/Db/Result.php
 			count: 1
 

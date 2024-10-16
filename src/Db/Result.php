@@ -140,7 +140,7 @@ class Result implements ColumnValueParser, \Countable, \IteratorAggregate
 		}
 
 		$this->detectColumnDataTypes();
-		$row = $this->rowFactory->createRow($this, $data);
+		$row = $this->rowFactory->create($this, $data);
 
 		if ($this->rowFetchMutator !== NULL) {
 			call_user_func($this->rowFetchMutator, $row);

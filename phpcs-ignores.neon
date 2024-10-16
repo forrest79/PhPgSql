@@ -235,7 +235,7 @@ ignoreErrors:
 
 	-
 		sniff: Squiz.Scope.MethodScope.Missing
-		message: Visibility must be declared on method "createResult"
+		message: Visibility must be declared on method "create"
 		count: 1
 		path: src/Db/ResultFactory.php
 
@@ -259,7 +259,7 @@ ignoreErrors:
 
 	-
 		sniff: Squiz.Scope.MethodScope.Missing
-		message: Visibility must be declared on method "createRow"
+		message: Visibility must be declared on method "create"
 		count: 1
 		path: src/Db/RowFactory.php
 

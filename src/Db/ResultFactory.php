@@ -10,7 +10,7 @@ interface ResultFactory
 	/**
 	 * @param array<int, string>|NULL $dataTypesCache
 	 */
-	function createResult(
+	function create(
 		PgSql\Result $queryResource,
 		Query $query,
 		RowFactory $rowFactory,

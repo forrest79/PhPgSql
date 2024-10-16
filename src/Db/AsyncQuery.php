@@ -71,7 +71,7 @@ class AsyncQuery
 			}
 		}
 
-		return $this->resultBuilder->buildResult($resource, $this->getQuery());
+		return $this->resultBuilder->build($resource, $this->getQuery());
 	}
 
 }

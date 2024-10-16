@@ -10,7 +10,7 @@ class Basic implements Db\RowFactory
 	/**
 	 * @param array<string, string|NULL> $rawValues
 	 */
-	public function createRow(Db\ColumnValueParser $columnValueParser, array $rawValues): Db\Row
+	public function create(Db\ColumnValueParser $columnValueParser, array $rawValues): Db\Row
 	{
 		return new Db\Row($columnValueParser, $rawValues);
 	}

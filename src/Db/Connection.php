@@ -315,7 +315,7 @@ class Connection
 			$this->events->onQuery($query, \hrtime(TRUE) - $startTime);
 		}
 
-		return $this->resultBuilder->buildResult($resource, $query);
+		return $this->resultBuilder->build($resource, $query);
 	}
 
 

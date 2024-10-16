@@ -8,6 +8,6 @@ interface RowFactory
 	/**
 	 * @param array<string, string|NULL> $rawValues
 	 */
-	function createRow(ColumnValueParser $columnValueParser, array $rawValues): Row;
+	function create(ColumnValueParser $columnValueParser, array $rawValues): Row;
 
 }
