@@ -42,8 +42,8 @@ final class CollectingResultsTest extends TestCase
 
 		$queryInsert = $resultInsert->getQuery();
 
-		Tester\Assert::same('INSERT INTO test(name) VALUES($1)', $queryInsert->getSql());
-		Tester\Assert::same(['phpgsql'], $queryInsert->getParams());
+		Tester\Assert::same('INSERT INTO test(name) VALUES($1)', $queryInsert->sql);
+		Tester\Assert::same(['phpgsql'], $queryInsert->params);
 
 		Tester\Assert::null($resultInsert->getParsedColumns());
 
@@ -56,8 +56,8 @@ final class CollectingResultsTest extends TestCase
 
 		$querySelect = $resultSelect->getQuery();
 
-		Tester\Assert::same('SELECT id, name FROM test', $querySelect->getSql());
-		Tester\Assert::same([], $querySelect->getParams());
+		Tester\Assert::same('SELECT id, name FROM test', $querySelect->sql);
+		Tester\Assert::same([], $querySelect->params);
 
 		Tester\Assert::equal(['id' => FALSE, 'name' => TRUE], $resultSelect->getParsedColumns());
 	}

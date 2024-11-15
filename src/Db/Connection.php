@@ -282,7 +282,7 @@ class Connection
 	 * @throws Exceptions\ConnectionException
 	 * @throws Exceptions\QueryException
 	 */
-	public function query(string|Query|Sql\Query $sql, mixed ...$params): Result
+	public function query(string|Query|Sql $sql, mixed ...$params): Result
 	{
 		\assert(\array_is_list($params));
 		return $this->queryArgs($sql, $params);
@@ -294,17 +294,17 @@ class Connection
 	 * @throws Exceptions\ConnectionException
 	 * @throws Exceptions\QueryException
 	 */
-	public function queryArgs(string|Query|Sql\Query $sql, array $params): Result
+	public function queryArgs(string|Query|Sql $sql, array $params): Result
 	{
-		$query = $this->prepareQuery($this->normalizeQuery($sql, $params));
+		$query = $this->prepareQuery(Query::from($sql, $params));
 
 		$startTime = $this->events->hasOnQuery() ? \hrtime(TRUE) : NULL;
 
-		$queryParams = $query->getParams();
+		$queryParams = $query->params;
 		if ($queryParams === []) {
-			$resource = @\pg_query($this->getConnectedResource(), $query->getSql()); // intentionally @
+			$resource = @\pg_query($this->getConnectedResource(), $query->sql); // intentionally @
 		} else {
-			$resource = @\pg_query_params($this->getConnectedResource(), $query->getSql(), $queryParams); // intentionally @
+			$resource = @\pg_query_params($this->getConnectedResource(), $query->sql, $queryParams); // intentionally @
 		}
 
 		if ($resource === FALSE) {
@@ -346,7 +346,7 @@ class Connection
 	 * @throws Exceptions\ConnectionException
 	 * @throws Exceptions\QueryException
 	 */
-	public function asyncQuery(string|Query|Sql\Query $sql, mixed ...$params): AsyncQuery
+	public function asyncQuery(string|Query|Sql $sql, mixed ...$params): AsyncQuery
 	{
 		\assert(\array_is_list($params));
 		return $this->asyncQueryArgs($sql, $params);
@@ -358,15 +358,15 @@ class Connection
 	 * @throws Exceptions\ConnectionException
 	 * @throws Exceptions\QueryException
 	 */
-	public function asyncQueryArgs(string|Query|Sql\Query $sql, array $params): AsyncQuery
+	public function asyncQueryArgs(string|Query|Sql $sql, array $params): AsyncQuery
 	{
-		$query = $this->prepareQuery($this->normalizeQuery($sql, $params));
+		$query = $this->prepareQuery(Query::from($sql, $params));
 
-		$queryParams = $query->getParams();
+		$queryParams = $query->params;
 		if ($queryParams === []) {
-			$querySuccess = @\pg_send_query($this->getConnectedResource(), $query->getSql()); // intentionally @
+			$querySuccess = @\pg_send_query($this->getConnectedResource(), $query->sql); // intentionally @
 		} else {
-			$querySuccess = @\pg_send_query_params($this->getConnectedResource(), $query->getSql(), $query->getParams()); // intentionally @
+			$querySuccess = @\pg_send_query_params($this->getConnectedResource(), $query->sql, $query->params); // intentionally @
 		}
 
 		if ($querySuccess === FALSE) {
@@ -510,22 +510,6 @@ class Connection
 	public function getResource(): PgSql\Connection
 	{
 		return $this->getConnectedResource();
-	}
-
-
-	/**
-	 * @param list<mixed> $params
-	 * @throws Exceptions\QueryException
-	 */
-	private function normalizeQuery(string|Query|Sql\Query $sql, array $params): Query
-	{
-		if (\is_string($sql)) {
-			$sql = new Sql\Query($sql, $params);
-		} else if ($params !== []) {
-			throw Exceptions\QueryException::cantPassParams();
-		}
-
-		return $sql instanceof Query ? $sql : $sql->createQuery();
 	}
 
 

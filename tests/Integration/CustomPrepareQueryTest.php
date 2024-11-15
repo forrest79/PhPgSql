@@ -21,8 +21,8 @@ final class CustomPrepareQueryTest extends TestCase
 	{
 		$this->connection->query('SELECT 1');
 
-		Tester\Assert::same('SELECT 1 + 1', $this->lastQuery->getSql());
-		Tester\Assert::same([], $this->lastQuery->getParams());
+		Tester\Assert::same('SELECT 1 + 1', $this->lastQuery->sql);
+		Tester\Assert::same([], $this->lastQuery->params);
 	}
 
 
@@ -30,8 +30,8 @@ final class CustomPrepareQueryTest extends TestCase
 	{
 		$this->connection->execute('SELECT 2');
 
-		Tester\Assert::same('SELECT 2 + 1', $this->lastQuery->getSql());
-		Tester\Assert::same([], $this->lastQuery->getParams());
+		Tester\Assert::same('SELECT 2 + 1', $this->lastQuery->sql);
+		Tester\Assert::same([], $this->lastQuery->params);
 	}
 
 
@@ -39,8 +39,8 @@ final class CustomPrepareQueryTest extends TestCase
 	{
 		$this->connection->prepareStatement('SELECT 3')->execute();
 
-		Tester\Assert::same('SELECT 3 + 1', $this->lastQuery->getSql());
-		Tester\Assert::same([], $this->lastQuery->getParams());
+		Tester\Assert::same('SELECT 3 + 1', $this->lastQuery->sql);
+		Tester\Assert::same([], $this->lastQuery->params);
 	}
 
 
@@ -48,8 +48,8 @@ final class CustomPrepareQueryTest extends TestCase
 	{
 		$this->connection->asyncQuery('SELECT 4');
 
-		Tester\Assert::same('SELECT 4 + 1', $this->lastQuery->getSql());
-		Tester\Assert::same([], $this->lastQuery->getParams());
+		Tester\Assert::same('SELECT 4 + 1', $this->lastQuery->sql);
+		Tester\Assert::same([], $this->lastQuery->params);
 	}
 
 
@@ -57,8 +57,8 @@ final class CustomPrepareQueryTest extends TestCase
 	{
 		$this->connection->asyncExecute('SELECT 5');
 
-		Tester\Assert::same('SELECT 5 + 1', $this->lastQuery->getSql());
-		Tester\Assert::same([], $this->lastQuery->getParams());
+		Tester\Assert::same('SELECT 5 + 1', $this->lastQuery->sql);
+		Tester\Assert::same([], $this->lastQuery->params);
 	}
 
 
@@ -66,8 +66,8 @@ final class CustomPrepareQueryTest extends TestCase
 	{
 		$this->connection->asyncPrepareStatement('SELECT 6')->execute();
 
-		Tester\Assert::same('SELECT 6 + 1', $this->lastQuery->getSql());
-		Tester\Assert::same([], $this->lastQuery->getParams());
+		Tester\Assert::same('SELECT 6 + 1', $this->lastQuery->sql);
+		Tester\Assert::same([], $this->lastQuery->params);
 	}
 
 
@@ -78,14 +78,14 @@ final class CustomPrepareQueryTest extends TestCase
 			protected function prepareQuery(string|Db\Query $query): string|Db\Query
 			{
 				if ($query instanceof Db\Query) {
-					$sql = $query->getSql();
+					$sql = $query->sql;
 				} else {
 					$sql = $query;
 				}
 
 				$sql .= ' + 1';
 
-				return ($query instanceof Db\Query) ? new Db\Query($sql, $query->getParams()) : $sql;
+				return ($query instanceof Db\Query) ? new Db\Query($sql, $query->params) : $sql;
 			}
 
 		};

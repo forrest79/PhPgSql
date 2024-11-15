@@ -4,10 +4,10 @@ namespace Forrest79\PhPgSql\Db;
 
 class Query
 {
-	private string $sql;
+	public readonly string $sql;
 
 	/** @var list<mixed> */
-	private array $params;
+	public readonly array $params;
 
 
 	/**
@@ -20,18 +20,18 @@ class Query
 	}
 
 
-	public function getSql(): string
-	{
-		return $this->sql;
-	}
-
-
 	/**
-	 * @return list<mixed>
+	 * @param list<mixed> $params
 	 */
-	public function getParams(): array
+	public static function from(string|self|Sql $query, array $params = []): self
 	{
-		return $this->params;
+		if (is_string($query)) {
+			$query = new Sql\Query($query, $params);
+		} else if ($params !== []) {
+			throw Exceptions\QueryException::cantPassParams();
+		}
+
+		return $query instanceof Sql ? SqlDefinition::createQuery($query->getSqlDefinition()) : $query;
 	}
 
 }

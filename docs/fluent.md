@@ -23,11 +23,10 @@ $query = $fluent
   ->select(['*'])
   ->from('users')
   ->where('id', 1)
-  ->createSqlQuery()
-  ->createQuery();
+  ->toDbQuery();
 
-dump($query->getSql()); // (string) 'SELECT * FROM users WHERE id = $1'
-dump($query->getParams()); // (array) [1]
+dump($query->sql); // (string) 'SELECT * FROM users WHERE id = $1'
+dump($query->params); // (array) [1]
 ```
 
 With the `QueryExecute` object you can run this query in DB. This object has all `fetch*()` methods as the `Db\Result` object.
@@ -825,11 +824,11 @@ You can use `WITH` with a simple string query, or defined it with `Db\Sql\Query`
 $query = $connection
   ->createQuery()
   ->with('active_users', 'SELECT id, nick, age, height_cm FROM users WHERE active = TRUE')
-  ->with('active_departments', new Forrest79\PhPgSql\Db\Sql\Query('SELECT id FROM departments WHERE active = ?', [TRUE]))
+  ->with('active_departments', Forrest79\PhPgSql\Db\Sql\Query::create('SELECT id FROM departments WHERE active = ?', TRUE))
   ->select(['au.id', 'au.nick', 'au.age', 'au.height_cm'])
   ->from('active_users', 'au')
   ->join('user_departments', 'ud', 'ud.department_id = au.id')
-  ->where('ud.department_id IN (?)', new Forrest79\PhPgSql\Db\Sql\Query('SELECT id FROM active_departments'));
+  ->where('ud.department_id IN (?)', Forrest79\PhPgSql\Db\Sql\Query::create('SELECT id FROM active_departments'));
 
 dump($query); // (Query) WITH active_users AS (SELECT id, nick, age, height_cm FROM users WHERE active = TRUE), active_departments AS (SELECT id FROM departments WHERE active = TRUE) SELECT au.id, au.nick, au.age, au.height_cm FROM active_users AS au INNER JOIN user_departments AS ud ON ud.department_id = au.id WHERE ud.department_id IN (SELECT id FROM active_departments)
 
@@ -964,7 +963,7 @@ class Query extends Forrest79\PhPgSql\Fluent\QueryExecute
   public function exists(): bool
   {
     return (bool) $this->connection
-      ->query('SELECT EXISTS (?)', $this->select(['TRUE'])->createSqlQuery())
+      ->query('SELECT EXISTS (?)', $this->select(['TRUE']))
       ->fetchSingle();
   }
 }

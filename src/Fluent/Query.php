@@ -117,7 +117,9 @@ class Query implements Db\Sql
 	/** @phpstan-var QueryParams */
 	private array $params = self::DEFAULT_PARAMS;
 
-	private Db\Sql\Query|NULL $query = NULL;
+	private Db\SqlDefinition|NULL $sqlDefinition = NULL;
+
+	private Db\Query|NULL $dbQuery = NULL;
 
 
 	public function __construct(QueryBuilder $queryBuilder)
@@ -931,7 +933,8 @@ class Query implements Db\Sql
 
 	protected function resetQuery(): void
 	{
-		$this->query = NULL;
+		$this->sqlDefinition = NULL;
+		$this->dbQuery = NULL;
 	}
 
 
@@ -949,28 +952,23 @@ class Query implements Db\Sql
 	/**
 	 * @throws Exceptions\QueryBuilderException
 	 */
-	public function createSqlQuery(): Db\Sql\Query
+	public function getSqlDefinition(): Db\SqlDefinition
 	{
-		if ($this->query === NULL) {
-			$this->query = $this->queryBuilder->createSqlQuery($this->queryType, $this->params);
+		if ($this->sqlDefinition === NULL) {
+			$this->sqlDefinition = $this->queryBuilder->createSqlDefinition($this->queryType, $this->params);
 		}
 
-		return $this->query;
+		return $this->sqlDefinition;
 	}
 
 
-	public function getSql(): string
+	public function toDbQuery(): Db\Query
 	{
-		return $this->createSqlQuery()->getSql();
-	}
+		if ($this->dbQuery === NULL) {
+			$this->dbQuery = Db\SqlDefinition::createQuery($this->getSqlDefinition());
+		}
 
-
-	/**
-	 * @return list<mixed>
-	 */
-	public function getParams(): array
-	{
-		return $this->createSqlQuery()->getParams();
+		return $this->dbQuery;
 	}
 
 

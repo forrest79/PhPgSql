@@ -21,10 +21,7 @@ class Condition implements Db\Sql, \ArrayAccess
 
 	private Query|NULL $query;
 
-	private string|NULL $sql = NULL;
-
-	/** @var list<mixed> */
-	private array $params = [];
+	private Db\SqlDefinition|NULL $sqlDefinition = NULL;
 
 
 	/**
@@ -51,7 +48,8 @@ class Condition implements Db\Sql, \ArrayAccess
 		if ($condition instanceof self) {
 			$this->conditions[] = $condition;
 		} else if ($condition instanceof Db\Sql) {
-			$this->conditions[] = \array_merge([$condition->getSql()], $condition->getParams());
+			$sqlDefinition = $condition->getSqlDefinition();
+			$this->conditions[] = \array_merge([$sqlDefinition->sql], $sqlDefinition->params);
 		} else {
 			\assert(\array_is_list($params));
 
@@ -220,7 +218,8 @@ class Condition implements Db\Sql, \ArrayAccess
 		foreach ($conditions as $i => $value) {
 			if (!($value instanceof self)) {
 				if ($value instanceof Db\Sql) {
-					$conditions[$i] = \array_merge([$value->getSql()], $value->getParams());
+					$sqlDefinition = $value->getSqlDefinition();
+					$conditions[$i] = \array_merge([$sqlDefinition->sql], $sqlDefinition->params);
 				} else if (!\is_array($value)) {
 					$conditions[$i] = [$value];
 				}
@@ -232,36 +231,20 @@ class Condition implements Db\Sql, \ArrayAccess
 	}
 
 
-	public function getSql(): string
+	public function getSqlDefinition(): Db\SqlDefinition
 	{
-		$this->prepareSql();
-		\assert($this->sql !== NULL);
-		return $this->sql;
-	}
+		if ($this->sqlDefinition === NULL) {
+			$params = [];
+			$this->sqlDefinition = new Db\SqlDefinition(self::process($this, $params), $params);
+		}
 
-
-	/**
-	 * @return list<mixed>
-	 */
-	public function getParams(): array
-	{
-		$this->prepareSql();
-		return $this->params;
+		return $this->sqlDefinition;
 	}
 
 
 	private function reset(): void
 	{
-		$this->sql = NULL;
-		$this->params = [];
-	}
-
-
-	private function prepareSql(): void
-	{
-		if ($this->sql === NULL) {
-			$this->sql = self::process($this, $this->params);
-		}
+		$this->sqlDefinition = NULL;
 	}
 
 

@@ -28,9 +28,9 @@ parameters:
 			count: 47
 
 		-
-			message: '#^Parameter \#2 \$queryParams of method Forrest79\\PhPgSql\\Fluent\\QueryBuilder::createSqlQuery\(\) expects array\{.+\}, array\{.*\} given\.$#'
-			path: %rootDir%/../../../tests/Unit/FluentQueryTest.php
+			message: "#^Parameter \\#2 \\$queryParams of method Forrest79\\\\PhPgSql\\\\Fluent\\\\QueryBuilder\\:\\:createSqlDefinition\\(\\) expects array\\{select\\: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct\\: bool, distinctOn\\: list\\<string\\>, tables\\: array\\<string, array\\{string, string\\}\\>, table\\-types\\: array\\{main\\: string\\|null, from\\: list\\<string\\>, joins\\: list\\<string\\>, using\\: string\\|null\\}, on\\-conditions\\: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\>, lateral\\-tables\\: array\\<string, string\\>, where\\: Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\|null, \\.\\.\\.\\}, array\\{with\\: array\\{queries\\: array\\{\\}\\}\\} given\\.$#"
 			count: 1
+			path: tests/Unit/FluentQueryTest.php
 
 		-
 			message: '#^Parameter \#1 \$columns of method Forrest79\\PhPgSql\\Fluent\\Query::select\(\) expects array\<int\|string, BackedEnum\|bool\|Forrest79\\PhPgSql\\Db\\Sql\|int\|string\|null\>, array\<string, array\<int, string\>\> given\.$#'
@@ -121,11 +121,6 @@ parameters:
 			message: '#^Unused result of "\|\|" operator\.$#'
 			path: %rootDir%/../../../benchmarks/BasicPhpBenchmark.php
 			count: 8
-
-		-
-			message: '#^Call to new Forrest79\\PhPgSql\\Db\\Sql\\Literal\(\) on a separate line has no effect\.$#'
-			path: %rootDir%/../../../benchmarks/BasicPhpBenchmark.php
-			count: 1
 
 		-
 			message: '#^Strict comparison using \!\=\= between array\<int, string\> and null will always evaluate to true\.$#'

@@ -80,7 +80,7 @@ class QueryExecute extends Query implements \Countable, \IteratorAggregate
 	public function execute(): Db\Result
 	{
 		if ($this->result === NULL) {
-			$this->result = $this->connection->query($this->createSqlQuery());
+			$this->result = $this->connection->query($this);
 
 			if ($this->rowFetchMutator !== NULL) {
 				$this->result->setRowFetchMutator($this->rowFetchMutator);
@@ -256,7 +256,7 @@ class QueryExecute extends Query implements \Countable, \IteratorAggregate
 	 */
 	public function asyncExecute(): Db\AsyncQuery
 	{
-		return $this->connection->asyncQuery($this->createSqlQuery());
+		return $this->connection->asyncQuery($this);
 	}
 
 

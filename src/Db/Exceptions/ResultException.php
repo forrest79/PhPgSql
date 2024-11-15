@@ -68,7 +68,7 @@ class ResultException extends Exception
 
 	public static function noOtherAsyncResult(Db\Query $query): self
 	{
-		return new self(\sprintf('No other result for async query \'%s\'.', $query->getSql()), self::NO_OTHER_ASYNC_RESULT);
+		return new self(\sprintf('No other result for async query \'%s\'.', $query->sql), self::NO_OTHER_ASYNC_RESULT);
 	}
 
 

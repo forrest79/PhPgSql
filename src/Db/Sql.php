@@ -5,12 +5,6 @@ namespace Forrest79\PhPgSql\Db;
 interface Sql
 {
 
-	function getSql(): string;
-
-
-	/**
-	 * @return list<mixed>
-	 */
-	function getParams(): array;
+	function getSqlDefinition(): SqlDefinition;
 
 }

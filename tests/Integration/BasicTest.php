@@ -155,9 +155,9 @@ final class BasicTest extends TestCase
 			&$hasExecute,
 			&$queryDuration,
 		): void {
-			if ($query->getSql() === 'SELECT 1') {
+			if ($query->sql === 'SELECT 1') {
 				$hasQuery = TRUE;
-			} else if ($query->getSql() === 'SELECT 2') {
+			} else if ($query->sql === 'SELECT 2') {
 				$hasExecute = TRUE;
 			}
 
@@ -171,9 +171,9 @@ final class BasicTest extends TestCase
 			&$hasQueryResult,
 			&$hasExecuteResult,
 		): void {
-			if ($result->getQuery()->getSql() === 'SELECT 1') {
+			if ($result->getQuery()->sql === 'SELECT 1') {
 				$hasQueryResult = TRUE;
-			} else if ($result->getQuery()->getSql() === 'SELECT 2') {
+			} else if ($result->getQuery()->sql === 'SELECT 2') {
 				$hasExecuteResult = TRUE;
 			}
 		});
@@ -281,8 +281,8 @@ final class BasicTest extends TestCase
 
 		$query = $result->getQuery();
 
-		Tester\Assert::same('SELECT TRUE WHERE 1 = $1', $query->getSql());
-		Tester\Assert::same([2], $query->getParams());
+		Tester\Assert::same('SELECT TRUE WHERE 1 = $1', $query->sql);
+		Tester\Assert::same([2], $query->params);
 	}
 
 

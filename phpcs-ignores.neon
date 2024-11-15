@@ -210,6 +210,12 @@ ignoreErrors:
 		path: src/Db/Query.php
 
 	-
+		sniff: SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty
+		message: Do not use public properties. Use method access instead.
+		count: 2
+		path: src/Db/Query.php
+
+	-
 		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
 		message: All classes should be declared using either the "abstract" or "final" keyword.
 		count: 1
@@ -271,13 +277,7 @@ ignoreErrors:
 
 	-
 		sniff: Squiz.Scope.MethodScope.Missing
-		message: Visibility must be declared on method "getParams"
-		count: 1
-		path: src/Db/Sql.php
-
-	-
-		sniff: Squiz.Scope.MethodScope.Missing
-		message: Visibility must be declared on method "getSql"
+		message: Visibility must be declared on method "getSqlDefinition"
 		count: 1
 		path: src/Db/Sql.php
 
@@ -298,6 +298,18 @@ ignoreErrors:
 		message: All classes should be declared using either the "abstract" or "final" keyword.
 		count: 1
 		path: src/Db/Sql/Query.php
+
+	-
+		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal
+		message: All classes should be declared using either the "abstract" or "final" keyword.
+		count: 1
+		path: src/Db/SqlDefinition.php
+
+	-
+		sniff: SlevomatCodingStandard.Classes.ForbiddenPublicProperty.ForbiddenPublicProperty
+		message: Do not use public properties. Use method access instead.
+		count: 2
+		path: src/Db/SqlDefinition.php
 
 	-
 		sniff: SlevomatCodingStandard.Classes.RequireAbstractOrFinal.ClassNeitherAbstractNorFinal

@@ -6,50 +6,37 @@ use Forrest79\PhPgSql\Db;
 
 class Expression implements Db\Sql
 {
-	private string $sql;
-
-	/** @var list<mixed> */
-	private array $params;
+	private Db\SqlDefinition $sqlDefinition;
 
 
 	/**
 	 * @param list<mixed> $params
 	 */
-	public function __construct(string $value, array $params)
+	final public function __construct(string $value, array $params)
 	{
-		$this->sql = $value;
-		$this->params = $params;
+		$this->sqlDefinition = new Db\SqlDefinition($value, $params);
 	}
 
 
-	public function getSql(): string
+	public function getSqlDefinition(): Db\SqlDefinition
 	{
-		return $this->sql;
+		return $this->sqlDefinition;
 	}
 
 
-	/**
-	 * @return list<mixed>
-	 */
-	public function getParams(): array
-	{
-		return $this->params;
-	}
-
-
-	public static function create(string $value, mixed ...$params): self
+	public static function create(string $value, mixed ...$params): static
 	{
 		\assert(\array_is_list($params));
-		return new self($value, $params);
+		return new static($value, $params);
 	}
 
 
 	/**
 	 * @param list<mixed> $params
 	 */
-	public static function createArgs(string $value, array $params): self
+	public static function createArgs(string $value, array $params): static
 	{
-		return new self($value, $params);
+		return new static($value, $params);
 	}
 
 }

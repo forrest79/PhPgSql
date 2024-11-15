@@ -485,10 +485,10 @@ dump($cnt); // (integer) 7
 ```php
 $departmentsQuery = Forrest79\PhPgSql\Db\Sql\Query::createArgs('SELECT id FROM departments WHERE id = ?', [1]);
 
-$query = $departmentsQuery->createQuery();
+$query = $departmentsQuery->toDbQuery();
 
-dump($query->getSql()); // (string) 'SELECT id FROM departments WHERE id = $1'
-dump($query->getParams()); // (array) [1]
+dump($query->sql); // (string) 'SELECT id FROM departments WHERE id = $1'
+dump($query->params); // (array) [1]
 ```
 
 #### Use custom result factory
@@ -993,14 +993,14 @@ $connection->addOnClose(function (Forrest79\PhPgSql\Db\Connection $connection): 
 
 $connection->addOnQuery(function (Forrest79\PhPgSql\Db\Connection $connection, Forrest79\PhPgSql\Db\Query $query, float|NULL $timeNs, string|NULL $prepareStatementName): void {
   // $time === NULL for async queries, $prepareStatementName !== NULL for prepared statements queries
-  dump($query->getSql()); // (string) 'SELECT nick FROM users WHERE id = $1'
-  dump($query->getParams()); // (array) [3]
+  dump($query->sql); // (string) 'SELECT nick FROM users WHERE id = $1'
+  dump($query->params); // (array) [3]
 });
 
 $connection->addOnResult(function (Forrest79\PhPgSql\Db\Connection $connection, Forrest79\PhPgSql\Db\Result $result): void {
   // this is call after result is created (only if query with result is call...)
-  dump($result->getQuery()->getSql()); // (string) 'SELECT nick FROM users WHERE id = $1'
-  dump($result->getQuery()->getParams()); // (array) [3]
+  dump($result->getQuery()->sql); // (string) 'SELECT nick FROM users WHERE id = $1'
+  dump($result->getQuery()->params); // (array) [3]
   dump($result->fetchSingle()); // (string) 'Steve'
 });
 

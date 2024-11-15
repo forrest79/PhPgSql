@@ -6,27 +6,18 @@ use Forrest79\PhPgSql\Db;
 
 class Literal implements Db\Sql
 {
-	private string $value;
+	private Db\SqlDefinition $sqlDefinition;
 
 
-	public function __construct(string $value)
+	final public function __construct(string $value)
 	{
-		$this->value = $value;
+		$this->sqlDefinition = new Db\SqlDefinition($value, []);
 	}
 
 
-	public function getSql(): string
+	public function getSqlDefinition(): Db\SqlDefinition
 	{
-		return $this->value;
-	}
-
-
-	/**
-	 * @return list<mixed>
-	 */
-	public function getParams(): array
-	{
-		return [];
+		return $this->sqlDefinition;
 	}
 
 
