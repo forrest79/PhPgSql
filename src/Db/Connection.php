@@ -10,10 +10,6 @@ class Connection
 
 	private bool $connectForceNew;
 
-	private bool $connectAsync;
-
-	private int $connectAsyncWaitSeconds;
-
 	private int $errorVerbosity;
 
 	private AsyncHelper $asyncHelper;
@@ -28,24 +24,15 @@ class Connection
 
 	private bool $connected = FALSE;
 
-	/** @var resource */
-	private $asyncStream;
-
 
 	/**
 	 * @throws Exceptions\ConnectionException
 	 */
-	public function __construct(
-		string $connectionConfig = '',
-		bool $connectForceNew = FALSE,
-		bool $connectAsync = FALSE,
-	)
+	public function __construct(string $connectionConfig = '', bool $connectForceNew = FALSE)
 	{
 		$this->connectionConfig = $connectionConfig;
 		$this->connectForceNew = $connectForceNew;
-		$this->connectAsync = $connectAsync;
 
-		$this->connectAsyncWaitSeconds = 15;
 		$this->errorVerbosity = \PGSQL_ERRORS_DEFAULT;
 
 		$this->asyncHelper = new AsyncHelper($this);
@@ -67,9 +54,6 @@ class Connection
 		if ($this->connectForceNew === TRUE) {
 			$connectType |= \PGSQL_CONNECT_FORCE_NEW;
 		}
-		if ($this->connectAsync === TRUE) {
-			$connectType |= \PGSQL_CONNECT_ASYNC;
-		}
 
 		$resource = @\pg_connect($this->connectionConfig, $connectType); // intentionally @
 		if ($resource === FALSE) {
@@ -80,22 +64,13 @@ class Connection
 
 		$this->resource = $resource;
 
-		if ($this->connectAsync === TRUE) {
-			$stream = \pg_socket($resource);
-			if ($stream === FALSE) {
-				throw Exceptions\ConnectionException::asyncStreamFailed();
-			}
-
-			$this->asyncStream = $stream;
-		} else {
-			if ($this->errorVerbosity !== \PGSQL_ERRORS_DEFAULT) {
-				\pg_set_error_verbosity($this->resource, $this->errorVerbosity);
-			}
-
-			$this->connected = TRUE;
-
-			$this->events->onConnect();
+		if ($this->errorVerbosity !== \PGSQL_ERRORS_DEFAULT) {
+			\pg_set_error_verbosity($this->resource, $this->errorVerbosity);
 		}
+
+		$this->connected = TRUE;
+
+		$this->events->onConnect();
 
 		return $this;
 	}
@@ -144,30 +119,6 @@ class Connection
 		}
 
 		$this->connectForceNew = $forceNew;
-
-		return $this;
-	}
-
-
-	public function setConnectAsync(bool $async = TRUE): static
-	{
-		if ($this->isConnected()) {
-			throw Exceptions\ConnectionException::cantChangeWhenConnected('async');
-		}
-
-		$this->connectAsync = $async;
-
-		return $this;
-	}
-
-
-	public function setConnectAsyncWaitSeconds(int $seconds): static
-	{
-		if ($this->isConnected()) {
-			throw Exceptions\ConnectionException::cantChangeWhenConnected('asyncWaitSeconds');
-		}
-
-		$this->connectAsyncWaitSeconds = $seconds;
 
 		return $this;
 	}
@@ -543,58 +494,7 @@ class Connection
 
 		\assert($this->resource !== NULL);
 
-		if ($this->connected === FALSE) {
-			$start = \hrtime(TRUE);
-			do {
-				$test = \hrtime(TRUE);
-				switch (\pg_connect_poll($this->resource)) {
-					case \PGSQL_POLLING_READING:
-						while (!self::asyncIsReadable($this->asyncStream));
-						break;
-					case \PGSQL_POLLING_WRITING:
-						while (!self::asyncIsWritable($this->asyncStream));
-						break;
-					case \PGSQL_POLLING_FAILED:
-						throw Exceptions\ConnectionException::asyncConnectFailed();
-					case \PGSQL_POLLING_OK:
-					case \PGSQL_POLLING_ACTIVE: // this can't happen?
-						if ($this->errorVerbosity !== \PGSQL_ERRORS_DEFAULT) {
-							\pg_set_error_verbosity($this->resource, $this->errorVerbosity);
-						}
-						$this->connected = TRUE;
-						$this->events->onConnect();
-
-						return $this->resource;
-				}
-			} while ((($test - $start) / 1000000000) <= $this->connectAsyncWaitSeconds);
-			throw Exceptions\ConnectionException::asyncConnectTimeout($test, $this->connectAsyncWaitSeconds);
-		}
-
 		return $this->resource;
-	}
-
-
-	/**
-	 * @param resource $stream
-	 */
-	private static function asyncIsReadable($stream): bool
-	{
-		$read = [$stream];
-		$write = $ex = [];
-
-		return (bool) \stream_select($read, $write, $ex, $usec = 1, 0);
-	}
-
-
-	/**
-	 * @param resource $stream
-	 */
-	private static function asyncIsWritable($stream): bool
-	{
-		$write = [$stream];
-		$read = $ex = [];
-
-		return (bool) \stream_select($read, $write, $ex, $usec = 1, 0);
 	}
 
 

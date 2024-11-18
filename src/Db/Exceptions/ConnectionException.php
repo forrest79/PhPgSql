@@ -9,14 +9,11 @@ class ConnectionException extends Exception
 	public const CONNECTION_FAILED = 3;
 	public const BAD_CONNECTION = 4;
 	public const CANT_GET_NOTICES = 5;
-	public const ASYNC_STREAM_FAILED = 6;
-	public const ASYNC_CONNECT_FAILED = 7;
-	public const ASYNC_CONNECT_TIMEOUT = 8;
-	public const ASYNC_CANCEL_FAILED = 9;
-	public const ASYNC_QUERY_SENT_FAILED = 10;
-	public const ASYNC_NO_QUERY_IS_SENT = 11;
-	public const ASYNC_NO_EXECUTE_IS_SENT = 12;
-	public const ASYNC_ANOTHER_QUERY_IS_RUNNING = 13;
+	public const ASYNC_CANCEL_FAILED = 6;
+	public const ASYNC_QUERY_SENT_FAILED = 7;
+	public const ASYNC_NO_QUERY_IS_SENT = 8;
+	public const ASYNC_NO_EXECUTE_IS_SENT = 9;
+	public const ASYNC_ANOTHER_QUERY_IS_RUNNING = 10;
 
 
 	public static function noConfig(): self
@@ -52,24 +49,6 @@ class ConnectionException extends Exception
 	public static function cantGetNotices(): self
 	{
 		return new self('Can\'t get notices from connection. Is notice message tracking not ignored in php.ini - pgsql.ignore_notice = 0 is the right value.', self::CANT_GET_NOTICES);
-	}
-
-
-	public static function asyncStreamFailed(): self
-	{
-		return new self('Asynchronous connection error.', self::ASYNC_STREAM_FAILED);
-	}
-
-
-	public static function asyncConnectFailed(): self
-	{
-		return new self('Asynchronous connection error.', self::ASYNC_CONNECT_FAILED);
-	}
-
-
-	public static function asyncConnectTimeout(float $afterSeconds, int $configSeconds): self
-	{
-		return new self(\sprintf('Asynchronous connection timeout after %f seconds (%d seconds are configured).', $afterSeconds, $configSeconds), self::ASYNC_CONNECT_TIMEOUT);
 	}
 
 

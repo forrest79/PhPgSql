@@ -13,32 +13,6 @@ require_once __DIR__ . '/TestCase.php';
 final class AsyncTest extends TestCase
 {
 
-	public function testIsConnected(): void
-	{
-		Tester\Assert::false($this->connection->isConnected());
-
-		$this->connection->execute('SELECT 1');
-
-		Tester\Assert::true($this->connection->isConnected());
-	}
-
-
-	public function testSetErrorVerbosityOnConnect(): void
-	{
-		$connection = $this->createConnection();
-
-		Tester\Assert::false($connection->isConnected());
-
-		$connection->setErrorVerbosity(\PGSQL_ERRORS_VERBOSE);
-
-		Tester\Assert::exception(static function () use ($connection): void {
-			$connection->query('SELECT bad_column');
-		}, Db\Exceptions\QueryException::class, '#ERROR:  42703: column "bad_column" does not exist#', Db\Exceptions\QueryException::QUERY_FAILED);
-
-		$connection->close();
-	}
-
-
 	public function testFetch(): void
 	{
 		$this->connection->query('
@@ -233,7 +207,7 @@ final class AsyncTest extends TestCase
 
 	protected function createConnection(): Db\Connection
 	{
-		return new Db\Connection($this->getTestConnectionConfig(), FALSE, TRUE);
+		return new Db\Connection($this->getTestConnectionConfig(), FALSE);
 	}
 
 }

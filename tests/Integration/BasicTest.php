@@ -13,6 +13,16 @@ require_once __DIR__ . '/TestCase.php';
 final class BasicTest extends TestCase
 {
 
+	public function testIsConnected(): void
+	{
+		Tester\Assert::false($this->connection->isConnected());
+
+		$this->connection->execute('SELECT 1');
+
+		Tester\Assert::true($this->connection->isConnected());
+	}
+
+
 	public function testGetLastErrorWithNoConnection(): void
 	{
 		Tester\Assert::same('unknown error', $this->connection->getLastError());
@@ -85,14 +95,6 @@ final class BasicTest extends TestCase
 	}
 
 
-	public function testConnectionAsync(): void
-	{
-		$this->connection->setConnectAsync(TRUE);
-		$this->connection->setConnectAsyncWaitSeconds(10);
-		Tester\Assert::true($this->connection->ping());
-	}
-
-
 	public function testFailedConnection(): void
 	{
 		$this->connection->setConnectionConfig(\str_replace('user=', 'user=non-existing-user-', $this->getConfig()));
@@ -115,20 +117,10 @@ final class BasicTest extends TestCase
 			$this->connection->setConnectForceNew();
 		}, Db\Exceptions\ConnectionException::class, NULL, Db\Exceptions\ConnectionException::CANT_CHANGE_WHEN_CONNECTED);
 
-		Tester\Assert::exception(function (): void {
-			$this->connection->setConnectAsync();
-		}, Db\Exceptions\ConnectionException::class, NULL, Db\Exceptions\ConnectionException::CANT_CHANGE_WHEN_CONNECTED);
-
-		Tester\Assert::exception(function (): void {
-			$this->connection->setConnectAsyncWaitSeconds(5);
-		}, Db\Exceptions\ConnectionException::class, NULL, Db\Exceptions\ConnectionException::CANT_CHANGE_WHEN_CONNECTED);
-
 		$this->connection->close();
 
 		$this->connection->setConnectionConfig('');
 		$this->connection->setConnectForceNew();
-		$this->connection->setConnectAsync();
-		$this->connection->setConnectAsyncWaitSeconds(5);
 	}
 
 
