@@ -50,4 +50,20 @@ class Helper
 		return '{' . \implode(',', $array) . '}';
 	}
 
+
+	/**
+	 * @param array<string, string|int|float|NULL> $config
+	 */
+	public static function prepareConfig(array $config): string
+	{
+		$configItems = [];
+		foreach ($config as $key => $value) {
+			if ($value !== NULL) {
+				$configItems[] = $key . '=\'' . $value . '\'';
+			}
+		}
+
+		return \implode(' ', $configItems);
+	}
+
 }
