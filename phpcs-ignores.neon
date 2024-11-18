@@ -477,6 +477,12 @@ ignoreErrors:
 		sniff: PSR1.Files.SideEffects.FoundWithSymbols
 		message: 'A file should declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it should execute logic with side effects, but should not do both. The first symbol is defined on line 15 and the first side effect is on line 9.'
 		count: 1
+		path: tests/Integration/FluentQueryExecuteFetchTest.php
+
+	-
+		sniff: PSR1.Files.SideEffects.FoundWithSymbols
+		message: 'A file should declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it should execute logic with side effects, but should not do both. The first symbol is defined on line 15 and the first side effect is on line 9.'
+		count: 1
 		path: tests/Integration/FluentQueryTest.php
 
 	-
@@ -517,9 +523,9 @@ ignoreErrors:
 
 	-
 		sniff: PSR1.Files.SideEffects.FoundWithSymbols
-		message: 'A file should declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it should execute logic with side effects, but should not do both. The first symbol is defined on line 15 and the first side effect is on line 9.'
+		message: 'A file should declare new symbols (classes, functions, constants, etc.) and cause no other side effects, or it should execute logic with side effects, but should not do both. The first symbol is defined on line 12 and the first side effect is on line 7.'
 		count: 1
-		path: tests/Integration/QueryExecuteFetchTest.php
+		path: tests/Integration/QueryTest.php
 
 	-
 		sniff: PSR1.Files.SideEffects.FoundWithSymbols

@@ -356,7 +356,7 @@ $query = $connection
     'phones' => Forrest79\PhPgSql\Db\Helper::createStringPgArray(['732123456', '736987654']),
   ]);
  
-dump($query); // (Query) INSERT INTO users (nick, inserted_datetime, active, age, height_cm, phones) VALUES($1, now(), TRUE, $2, $3, $4) [Params: (array) ['James', 37, (NULL), '{\"732123456\",\"736987654\"}']]
+dump($query); // (Query) INSERT INTO users (nick, inserted_datetime, active, age, height_cm, phones) VALUES($1, now(), $2, $3, $4, $5) [Params: (array) ['James', 't', 37, (NULL), '{\"732123456\",\"736987654\"}']]
 
 $result = $query->execute();
 
@@ -830,7 +830,7 @@ $query = $connection
   ->join('user_departments', 'ud', 'ud.department_id = au.id')
   ->where('ud.department_id IN (?)', Forrest79\PhPgSql\Db\Sql\Query::create('SELECT id FROM active_departments'));
 
-dump($query); // (Query) WITH active_users AS (SELECT id, nick, age, height_cm FROM users WHERE active = TRUE), active_departments AS (SELECT id FROM departments WHERE active = TRUE) SELECT au.id, au.nick, au.age, au.height_cm FROM active_users AS au INNER JOIN user_departments AS ud ON ud.department_id = au.id WHERE ud.department_id IN (SELECT id FROM active_departments)
+dump($query); // (Query) WITH active_users AS (SELECT id, nick, age, height_cm FROM users WHERE active = TRUE), active_departments AS (SELECT id FROM departments WHERE active = $1) SELECT au.id, au.nick, au.age, au.height_cm FROM active_users AS au INNER JOIN user_departments AS ud ON ud.department_id = au.id WHERE ud.department_id IN (SELECT id FROM active_departments) [Params: (array) ['t']]
 
 $query->execute();
 ```

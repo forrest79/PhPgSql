@@ -817,12 +817,7 @@ final class FetchTest extends TestCase
 
 	private function fetch(Db\Result $result): Db\Row
 	{
-		$row = $result->fetch();
-		if ($row === NULL) {
-			throw new \RuntimeException('No data from database were returned');
-		}
-
-		return $row;
+		return $result->fetch() ?? throw new \RuntimeException('No data from database were returned');
 	}
 
 

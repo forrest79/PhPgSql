@@ -54,8 +54,6 @@ class SqlDefinition
 						$parsedParams[] = ($value instanceof \BackedEnum) ? $value->value : $value;
 					}
 					return \implode(', ', $keys);
-				} else if (\is_bool($param)) {
-					return $param === TRUE ? 'TRUE' : 'FALSE'; // @todo as param
 				} else if ($param instanceof Sql) {
 					$subquerySql = self::processSqlDefinition($param->getSqlDefinition(), $paramIndex);
 					$paramIndex += \count($subquerySql->params);
@@ -63,7 +61,13 @@ class SqlDefinition
 					return $subquerySql->sql;
 				}
 
-				$parsedParams[] = ($param instanceof \BackedEnum) ? $param->value : $param;
+				if (\is_bool($param)) {
+					$parsedParams[] = $param ? 't' : 'f';
+				} else if ($param instanceof \BackedEnum) {
+					$parsedParams[] = $param->value;
+				} else {
+					$parsedParams[] = $param;
+				}
 
 				return '$' . ++$paramIndex;
 			},

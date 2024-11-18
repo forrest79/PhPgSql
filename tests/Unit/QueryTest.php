@@ -115,6 +115,14 @@ final class QueryTest extends Tests\TestCase
 	}
 
 
+	public function testPrepareQueryWithBool(): void
+	{
+		$query = Db\Sql\Query::create('SELECT * FROM table WHERE column1 = ? AND column2 = ?', TRUE, FALSE)->toDbQuery();
+		Tester\Assert::same('SELECT * FROM table WHERE column1 = $1 AND column2 = $2', $query->sql);
+		Tester\Assert::same(['t', 'f'], $query->params);
+	}
+
+
 	public function testPrepareQueryWithEnum(): void
 	{
 		$query = Db\Sql\Query::create('SELECT * FROM table WHERE column = ?', Tests\TestEnum::One)->toDbQuery();
