@@ -203,16 +203,6 @@ class Connection
 	}
 
 
-	/**
-	 * @deprecated Use setRowFactory() method.
-	 */
-	public function setDefaultRowFactory(RowFactory $rowFactory): static
-	{
-		\trigger_error('Use setRowFactory() method.', \E_USER_DEPRECATED);
-		return $this->setRowFactory($rowFactory);
-	}
-
-
 	public function setDataTypeParser(DataTypeParser $dataTypeParser): static
 	{
 		$this->resultBuilder->setDataTypeParser($dataTypeParser);

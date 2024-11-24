@@ -4,10 +4,7 @@ namespace Forrest79\PhPgSql\Fluent;
 
 use Forrest79\PhPgSql\Db;
 
-/**
- * @implements \IteratorAggregate<int, Db\Row>
- */
-class QueryExecute extends Query implements \Countable, \IteratorAggregate
+class QueryExecute extends Query implements \Countable
 {
 	private Db\Connection $connection;
 
@@ -141,20 +138,6 @@ class QueryExecute extends Query implements \Countable, \IteratorAggregate
 	{
 		/** @phpstan-var int<0, max> */
 		return $this->execute()->getRowCount();
-	}
-
-
-	/**
-	 * @deprecated Use fetchIterator() method.
-	 * @throws Db\Exceptions\ConnectionException
-	 * @throws Db\Exceptions\QueryException
-	 * @throws Exceptions\QueryException
-	 * @throws Exceptions\QueryBuilderException
-	 */
-	public function getIterator(): Db\RowIterator
-	{
-		\trigger_error('Use fetchIterator() method.', \E_USER_DEPRECATED);
-		return $this->execute()->getIterator();
 	}
 
 

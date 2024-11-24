@@ -4,10 +4,7 @@ namespace Forrest79\PhPgSql\Db;
 
 use PgSql;
 
-/**
- * @implements \IteratorAggregate<int, Row>
- */
-class Result implements ColumnValueParser, \Countable, \IteratorAggregate
+class Result implements ColumnValueParser, \Countable
 {
 	protected PgSql\Result $queryResource;
 
@@ -82,16 +79,6 @@ class Result implements ColumnValueParser, \Countable, \IteratorAggregate
 		$this->columnsFetchMutator = $columnsFetchMutator;
 
 		return $this;
-	}
-
-
-	/**
-	 * @deprecated Use fetchIterator() method.
-	 */
-	public function getIterator(): RowIterator
-	{
-		\trigger_error('Use fetchIterator() method.', \E_USER_DEPRECATED);
-		return new RowIterator($this);
 	}
 
 

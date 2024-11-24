@@ -209,10 +209,3 @@ parameters:
 			message: "#^Property Forrest79\\\\PhPgSql\\\\Fluent\\\\Query::\\$params \\(array\\{select: array\\<int\\|string, BackedEnum\\|Forrest79\\\\PhPgSql\\\\Db\\\\Sql\\|int\\|string\\>, distinct: bool, distinctOn: list\\<string\\>, tables: array\\<string, array\\{string, string\\}\\>, table\\-types: array\\{main: string\\|null, from: list\\<string\\>, joins: list\\<string\\>, using: string\\|null\\}, on\\-conditions: array\\<string, Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\>, lateral\\-tables: array\\<string, string\\>, where: Forrest79\\\\PhPgSql\\\\Fluent\\\\Condition\\|null, \\.\\.\\.\\}\\) does not accept .+\\.$#"
 			path: src/Fluent/Query.php
 			count: 6
-
-		# === Fix PhPgSql-PHPStan rules ===
-
-		-
-			message: '#^Method Forrest79\\PhPgSql\\Fluent\\QueryExecute::getIterator\(\) should return Forrest79\\PhPgSql\\Db\\RowIterator but returns iterable<int, Forrest79\\PhPgSql\\Db\\Row>\.$#'
-			path: %rootDir%/../../../src/Fluent/QueryExecute.php
-			count: 1
